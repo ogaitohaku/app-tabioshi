@@ -73,7 +73,7 @@ export default async function TypeCompat({ params }: PageProps<"/type/[code]/[ot
         </section>
 
         <Link href="/type" className="flex h-12 items-center justify-center rounded-full border border-line bg-card text-sm font-bold">
-          旅タイプ診断をする(16問・約1分)
+          旅タイプ診断をする(20問・約2分)
         </Link>
       </div>
     </main>

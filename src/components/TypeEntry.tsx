@@ -12,7 +12,7 @@ export function TypeEntry({ names }: { names: { [code: string]: string } }) {
       <span className="min-w-0 flex-1">
         <span className="block text-[11px] font-bold tracking-[0.2em] text-white/60">TRAVEL TYPE</span>
         <span className="block text-base leading-snug font-black">{name ? `あなたは「${name}」` : "あなたは、どんな旅人?"}</span>
-        <span className="block text-xs text-white/75">{name ? "結果と、友だちとの相性を見る" : "16問・約1分の旅タイプ診断"}</span>
+        <span className="block text-xs text-white/75">{name ? "結果と、友だちとの相性を見る" : "20問・約2分の旅タイプ診断"}</span>
       </span>
       <span aria-hidden className="text-xl">→</span>
     </Link>

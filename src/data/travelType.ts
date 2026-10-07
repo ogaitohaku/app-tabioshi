@@ -12,107 +12,53 @@ export const AXES = [
 
 export type AxisId = (typeof AXES)[number]["id"];
 
-export type TypeQuestion = { axis: AxisId; text: string; options: { label: string; score: number }[] };
+/** 設問は「旅の中でよくする行動」の文。そう思う〜そう思わないの7段階で答える。
+ *  key が 1 なら「そう思う」ほど左の文字(D・I・M・Q)、-1 なら右の文字(S・P・O・G)に寄る。
+ *  同じ向きの文ばかりだと「なんでも、そう思う」と答える人の結果が偏るので、各軸に両方の向きを混ぜている */
+export type TypeQuestion = { axis: AxisId; text: string; key: 1 | -1; extra?: true };
 
-/** 設問。日常の旅の場面で聞く。各軸4問、選択肢の点は +2 / +1 / −1 / −2 */
+/** 7段階の答え。左から そう思う(+3)… どちらでもない(0) … そう思わない(−3) */
+export const SCALE = [3, 2, 1, 0, -1, -2, -3] as const;
+
+/** 各軸5問・計20問(+僅差の軸だけ追加3問)。軸が続かないように順番を混ぜて並べる */
 export const QUESTIONS: TypeQuestion[] = [
-  { axis: "where", text: "旅先で、気になる細い路地を見つけた。", options: [
-    { label: "予定を変えて入ってみる", score: 2 },
-    { label: "帰りに時間があれば寄る", score: 1 },
-    { label: "写真だけ撮って予定通り進む", score: -1 },
-    { label: "知らない道には入らない", score: -2 },
-  ] },
-  { axis: "decide", text: "宿を決めるのは、だいたいいつ?", options: [
-    { label: "当日、着いてから", score: 2 },
-    { label: "1週間前くらい", score: 1 },
-    { label: "1か月前に、比べて決める", score: -1 },
-    { label: "半年前から、一番いい日を狙う", score: -2 },
-  ] },
-  { axis: "with", text: "理想の旅の人数は?", options: [
-    { label: "一人", score: 2 },
-    { label: "気の合う一人と", score: 1 },
-    { label: "3〜4人の仲間と", score: -1 },
-    { label: "大人数でわいわい", score: -2 },
-  ] },
-  { axis: "depth", text: "1泊2日で回りたい場所の数は?", options: [
-    { label: "5か所以上", score: 2 },
-    { label: "3〜4か所", score: 1 },
-    { label: "2か所くらい", score: -1 },
-    { label: "宿から出なくてもいい", score: -2 },
-  ] },
-  { axis: "where", text: "久しぶりの3連休。行き先は?", options: [
-    { label: "行ったことのない県", score: 2 },
-    { label: "前から気になっていた場所", score: 1 },
-    { label: "前に行って良かった場所", score: -1 },
-    { label: "いつもの温泉", score: -2 },
-  ] },
-  { axis: "decide", text: "旅の前の日の夜。", options: [
-    { label: "何も決めずに寝る", score: 2 },
-    { label: "行きたい所を3つだけメモ", score: 1 },
-    { label: "時間ごとの予定を作る", score: -1 },
-    { label: "雨の日の予定まで作る", score: -2 },
-  ] },
-  { axis: "with", text: "宿で、夜ごはんのあと。", options: [
-    { label: "部屋で一人のんびり", score: 2 },
-    { label: "一人で夜の散歩に出る", score: 1 },
-    { label: "一緒に来た人と語る", score: -1 },
-    { label: "宿の人や他のお客さんと話す", score: -2 },
-  ] },
-  { axis: "depth", text: "同じ旅先には、何回行く?", options: [
-    { label: "一度行ったら次の場所へ", score: 2 },
-    { label: "たまにまた行く", score: 1 },
-    { label: "気に入ったら毎年", score: -1 },
-    { label: "季節ごとに通う", score: -2 },
-  ] },
-  { axis: "where", text: "ご飯どきの店選び。", options: [
-    { label: "看板もない地元の店", score: 2 },
-    { label: "地元の人に聞いた店", score: 1 },
-    { label: "名物が食べられる有名店", score: -1 },
-    { label: "味を知っているいつもの店", score: -2 },
-  ] },
-  { axis: "decide", text: "予定していた店が、臨時休業だった。", options: [
-    { label: "歩いて、目についた店に入る", score: 2 },
-    { label: "その場の気分で次を決める", score: 1 },
-    { label: "用意していた第2候補へ", score: -1 },
-    { label: "口コミを比べ直してから決める", score: -2 },
-  ] },
-  { axis: "with", text: "旅の写真は?", options: [
-    { label: "自分のために撮る。誰にも見せない", score: 2 },
-    { label: "あとで自分で見返す用", score: 1 },
-    { label: "一緒に行った人とLINEで分ける", score: -1 },
-    { label: "その日のうちにSNSに載せる", score: -2 },
-  ] },
-  { axis: "depth", text: "旅の朝。", options: [
-    { label: "日の出前に出発", score: 2 },
-    { label: "朝ごはんを食べたらすぐ出る", score: 1 },
-    { label: "チェックアウトぎりぎりまでのんびり", score: -1 },
-    { label: "連泊なので予定なし", score: -2 },
-  ] },
-  { axis: "where", text: "旅のお土産は?", options: [
-    { label: "地元のスーパーで見つけた謎の調味料", score: 2 },
-    { label: "工房で作り手から買う器", score: 1 },
-    { label: "定番の銘菓", score: -1 },
-    { label: "帰りの駅でまとめて買う", score: -2 },
-  ] },
-  { axis: "decide", text: "旅先で一番うれしい瞬間は?", options: [
-    { label: "予想していなかった出会い", score: 2 },
-    { label: "ふと見つけた景色", score: 1 },
-    { label: "予定通り全部回れた時", score: -1 },
-    { label: "調べた通りの味だった時", score: -2 },
-  ] },
-  { axis: "with", text: "行きたい店で、同行者と意見が分かれた。", options: [
-    { label: "別行動して、あとで合流", score: 2 },
-    { label: "自分の行きたい方を推す", score: 1 },
-    { label: "相手に合わせる", score: -1 },
-    { label: "両方行けるように組み直す", score: -2 },
-  ] },
-  { axis: "depth", text: "旅から帰って、一番残っているのは?", options: [
-    { label: "回った場所の数", score: 2 },
-    { label: "撮った写真", score: 1 },
-    { label: "ある一日の空気", score: -1 },
-    { label: "現地で聞いた話や、人の名前", score: -2 },
-  ] },
+  { axis: "where", key: 1, text: "旅先には、行ったことのない場所を選ぶことが多い" },
+  { axis: "decide", key: -1, text: "旅の前に、時間ごとの予定を立てる" },
+  { axis: "with", key: 1, text: "一人旅をよくする(または、してみたい)" },
+  { axis: "depth", key: 1, text: "1泊2日なら、できるだけ多くの場所を回りたい" },
+  { axis: "where", key: -1, text: "旅先は、評判の確かな定番の場所から選ぶ" },
+  { axis: "decide", key: 1, text: "宿を、直前や当日に決めることがある" },
+  { axis: "with", key: -1, text: "旅の写真や感想は、その日のうちに誰かと分け合う" },
+  { axis: "depth", key: -1, text: "気に入った場所には、半日以上いることがある" },
+  { axis: "where", key: 1, text: "地図で見つけた知らない地名に、ふらっと行ってみたくなる" },
+  { axis: "decide", key: -1, text: "お店は、口コミや値段を比べてから決める" },
+  { axis: "with", key: 1, text: "同行者がいても、一人で歩く時間がほしい" },
+  { axis: "depth", key: 1, text: "旅の朝は早く出発して、一日を長く使う" },
+  { axis: "where", key: -1, text: "前に行って良かった宿に、また泊まりたい" },
+  { axis: "decide", key: 1, text: "予定になかった寄り道で、行き先が変わることがよくある" },
+  { axis: "with", key: -1, text: "宿の人や地元の人と話すのが、旅の楽しみだ" },
+  { axis: "depth", key: -1, text: "名所を回るより、その土地の歴史や作り手の話を聞きたい" },
+  { axis: "where", key: 1, text: "ご飯は、ガイドに載っていない地元の店を探す" },
+  { axis: "decide", key: -1, text: "雨の日や混んだときの代わりの案も、用意しておく" },
+  { axis: "with", key: -1, text: "行き先は、友だちや家族と相談して決めたい" },
+  { axis: "depth", key: -1, text: "宿でのんびりする時間も、旅の目的のうちだ" },
+  // ここから追加の問。20問で左右がほぼ半々(僅差)だった軸だけ、3問ずつ聞き足す
+  { axis: "where", key: 1, extra: true, text: "旅先で、乗ったことのない路線やバスに乗ってみたくなる" },
+  { axis: "where", key: -1, extra: true, text: "初めての土地より、勝手がわかる土地のほうが落ち着く" },
+  { axis: "where", key: 1, extra: true, text: "まだあまり知られていない場所を、探すのが好きだ" },
+  { axis: "decide", key: 1, extra: true, text: "旅の当日の朝に、行き先を変えたことがある" },
+  { axis: "decide", key: -1, extra: true, text: "乗る電車やバスの時刻は、出発前に決めておく" },
+  { axis: "decide", key: -1, extra: true, text: "旅の予算は、出発前におおよそ決めている" },
+  { axis: "with", key: 1, extra: true, text: "旅先の食事は、一人でも気にならない" },
+  { axis: "with", key: -1, extra: true, text: "旅は、誰と行くかが一番大事だ" },
+  { axis: "with", key: 1, extra: true, text: "旅先では、誰にも気をつかわず静かに過ごしたい" },
+  { axis: "depth", key: 1, extra: true, text: "移動が長くなっても、見たい場所は全部回りたい" },
+  { axis: "depth", key: -1, extra: true, text: "工房や資料館では、時間をかけてじっくり見る" },
+  { axis: "depth", key: 1, extra: true, text: "一つの場所に長くいると、次へ行きたくなる" },
 ];
+
+/** はじめに必ず聞く20問 */
+export const CORE_COUNT = QUESTIONS.filter((q) => !q.extra).length;
 
 export type TravelType = {
   code: string;

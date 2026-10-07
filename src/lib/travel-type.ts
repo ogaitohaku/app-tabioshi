@@ -1,28 +1,88 @@
-// 旅タイプ診断の計算(採点・星・相性)。画面からも、サーバーからも使う。
-import { AXES, QUESTIONS, type AxisId } from "@/data/travelType";
+// 旅タイプ診断の計算(採点・確かさ・相性)。画面からも、サーバーからも使う。
+import { AXES, CORE_COUNT, QUESTIONS, type AxisId } from "@/data/travelType";
 
 export type Scores = Record<AxisId, number>;
 
-/** 答え(各問の選んだ選択肢の番号)から、軸ごとの合計とコードを出す */
-export function scoreAnswers(answers: number[]): { code: string; scores: Scores } {
+export type Clarity = "僅差" | "やや" | "はっきり";
+export type Certainty = "高い" | "ふつう" | "低い";
+
+export type TypeResult = {
+  code: string;
+  /** 各軸の合計(−15〜+15)。+ なら左の文字 */
+  scores: Scores;
+  /** 左の文字(D・I・M・Q)寄りの割合(0〜100) */
+  pct: Scores;
+  clarity: Record<AxisId, Clarity>;
+  /** 結果の確かさ。「どちらでもない」の多さと、同じ軸の答えのそろい方で決める */
+  certainty: Certainty;
+};
+
+
+export const clarityOf = (pct: number): Clarity => {
+  const d = Math.abs(pct - 50);
+  return d < 10 ? "僅差" : d < 30 ? "やや" : "はっきり";
+};
+
+/** 答え(QUESTIONS と同じ順。各問 +3〜−3、+ が「そう思う」。聞いていない問は undefined)から結果を出す */
+export function scoreAnswers(answers: (number | undefined)[]): TypeResult {
+  const given = answers.slice(0, QUESTIONS.length).filter((a): a is number => a !== undefined);
+  // 何にでも「そう思う」(または「そう思わない」)と答えるくせを打ち消す。
+  // 各軸に両方の向きの文があるので、その人の答えの平均を引くと、くせの分だけが消える
+  // くせは最初の20問(左右の向きをそろえた問)だけで測る
+  const core = answers.slice(0, CORE_COUNT).filter((a): a is number => a !== undefined);
+  const bias = core.reduce((n, a) => n + a, 0) / Math.max(1, core.length);
   const scores: Scores = { where: 0, decide: 0, with: 0, depth: 0 };
-  const last: Partial<Scores> = {};
+  const parts: Record<AxisId, number[]> = { where: [], decide: [], with: [], depth: [] };
   QUESTIONS.forEach((q, i) => {
-    const pick = answers[i];
-    if (pick === undefined) return;
-    const s = q.options[pick].score;
-    scores[q.axis] += s;
-    last[q.axis] = s;
+    const a = answers[i];
+    if (a === undefined) return;
+    const v = (a - bias) * q.key;
+    scores[q.axis] += v;
+    parts[q.axis].push(v);
   });
-  const code = AXES.map((a) => {
-    const v = scores[a.id] || (last[a.id] ?? 1); // 合計が0なら、その軸の最後の答えで決める
-    return v > 0 ? a.left : a.right;
+
+  const pct = {} as Scores;
+  const clarity = {} as Record<AxisId, Clarity>;
+  let agree = 0;
+  let counted = 0;
+  const code = AXES.map((ax) => {
+    let v = scores[ax.id];
+    // 合計がちょうど0なら、いちばん強く答えた問で決める
+    if (Math.abs(v) < 1e-9) v = parts[ax.id].reduce((m, x) => (Math.abs(x) > Math.abs(m) ? x : m), 0) || 1;
+    const max = Math.max(1, parts[ax.id].length * 3);
+    pct[ax.id] = Math.round(Math.max(0, Math.min(100, 50 + (scores[ax.id] / max) * 50)));
+    clarity[ax.id] = clarityOf(pct[ax.id]);
+    for (const x of parts[ax.id]) {
+      if (Math.abs(x) < 0.5) continue;
+      counted++;
+      if (Math.sign(x) === Math.sign(v)) agree++;
+    }
+    scores[ax.id] = Math.round(scores[ax.id] * 10) / 10;
+    return v > 0 ? ax.left : ax.right;
   }).join("");
-  return { code, scores };
+
+  const neutral = given.filter((a) => a === 0).length;
+  const consistency = counted ? agree / counted : 0;
+  const close = AXES.filter((ax) => clarity[ax.id] === "僅差").length;
+  const certainty: Certainty =
+    neutral > given.length / 2 || consistency < 0.6 || close >= 2 ? "低い" : close === 0 && consistency >= 0.7 ? "高い" : "ふつう";
+  return { code, scores, pct, clarity, certainty };
 }
 
-/** 各軸の強さ(1〜5の星)。合計の幅は −8〜+8 */
-export const stars = (v: number) => Math.max(1, Math.min(5, Math.round((Math.abs(v) / 8) * 4) + 1));
+/** 各軸の強さ(1〜5)。左右どちらかへの寄り方で決める */
+/** 20問で僅差だった軸(追加で聞く軸) */
+export const closeAxes = (r: TypeResult) => AXES.filter((ax) => r.clarity[ax.id] === "僅差").map((ax) => ax.id);
+
+/** 僅差の軸の文字を入れ替えた「もう一つの可能性」のタイプ */
+export function altCode(r: TypeResult) {
+  const close = closeAxes(r);
+  if (close.length !== 1) return null;
+  const i = AXES.findIndex((ax) => ax.id === close[0]);
+  const ax = AXES[i];
+  return r.code.slice(0, i) + (r.code[i] === ax.left ? ax.right : ax.left) + r.code.slice(i + 1);
+}
+
+export const stars = (pct: number) => Math.max(1, Math.min(5, Math.round((Math.abs(pct - 50) / 50) * 4) + 1));
 
 export type CompatRow = { label: string; level: number; text: string };
 

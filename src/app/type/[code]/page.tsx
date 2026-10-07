@@ -12,7 +12,7 @@ export const generateStaticParams = () => allTravelTypes().map((t) => ({ code: t
 
 export async function generateMetadata({ params }: PageProps<"/type/[code]">): Promise<Metadata> {
   const t = getTravelType((await params).code);
-  return { title: t && `${t.name}(${t.code})| 旅タイプ診断`, description: t && `「${t.catch}」あなたの旅タイプは?16問・約1分の旅タイプ診断。` };
+  return { title: t && `${t.name}(${t.code})| 旅タイプ診断`, description: t && `「${t.catch}」あなたの旅タイプは?20問・約2分の旅タイプ診断。` };
 }
 
 export default async function TypeResult({ params }: PageProps<"/type/[code]">) {

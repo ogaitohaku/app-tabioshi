@@ -27,7 +27,7 @@ export function ForYou({ trips, cards, themeLabel }: { trips: TripFacts[]; cards
           <h2 className="text-lg font-black">好きな旅を教えてください</h2>
           <p className="text-xs text-white/70">答えはこのスマホの中だけに保存します。</p>
           <Link href="/type" className="mt-1 inline-block text-xs font-bold text-shu underline">
-            旅タイプ診断で決める(16問・約1分)
+            旅タイプ診断で決める(20問・約2分)
           </Link>
         </div>
         <fieldset className="flex flex-col gap-2">
