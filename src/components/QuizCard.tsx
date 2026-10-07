@@ -1,0 +1,49 @@
+"use client";
+import { useState } from "react";
+import type { Quiz } from "@/data/types";
+import { Icon } from "./Icon";
+
+export function QuizCard({ quiz, creatorName }: { quiz: Quiz; creatorName?: string }) {
+  const [picked, setPicked] = useState<number | null>(null);
+  const done = picked !== null;
+  const right = picked === quiz.answer;
+  return (
+    <div className="flex flex-col gap-2.5 rounded-2xl border border-line bg-card p-4">
+      <p className="text-[11px] font-bold text-shu">旅の予習クイズ</p>
+      <p className="font-bold leading-snug">{quiz.question}</p>
+      <div className="flex flex-col gap-2">
+        {quiz.options.map((o, i) => {
+          const isAns = done && i === quiz.answer;
+          const isWrong = done && i === picked && !right;
+          return (
+            <button
+              key={o}
+              type="button"
+              disabled={done}
+              onClick={() => setPicked(i)}
+              className={`flex items-center gap-2 rounded-xl border px-3 py-2.5 text-left text-sm ${
+                isAns ? "border-moss bg-moss-soft font-bold" : isWrong ? "border-shu bg-shu-soft" : "border-line"
+              }`}
+            >
+              <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-paper text-[11px] font-bold text-mute">
+                {isAns ? <Icon name="check" className="h-3.5 w-3.5 text-moss" /> : "ABC"[i]}
+              </span>
+              {o}
+            </button>
+          );
+        })}
+      </div>
+      {done && (
+        <div className="rounded-xl bg-paper p-3 text-sm leading-relaxed" role="status">
+          <p className={`font-bold ${right ? "text-moss" : "text-shu"}`}>{right ? "正解!" : "ざんねん"}</p>
+          <p className="text-ink2">{quiz.explain}</p>
+          {quiz.creatorSays && (
+            <p className="mt-1 text-xs text-mute">
+              {creatorName}「{quiz.creatorSays}」
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}

@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+/* タビオシの色と文字。明るい表示だけ(ダークモードは使わない方針) */
+@theme {
+  --color-paper: #fafaf8;
+  --color-card: #ffffff;
+  --color-ink: #16181d;
+  --color-ink2: #4a4f59;
+  --color-mute: #878c96;
+  --color-line: #e7e7e3;
+  --color-shu: #e8502e;
+  --color-shu-soft: #fdede7;
+  --color-sea: #1f5f7a;
+  --color-sea-soft: #e7f0f3;
+  --color-moss: #3e6b3a;
+  --color-moss-soft: #ecf2ea;
+  --font-sans: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", Meiryo, system-ui, sans-serif;
+}
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+body {
+  font-family: var(--font-sans);
+  font-feature-settings: "palt" 1;
+  -webkit-tap-highlight-color: transparent;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-shu);
+  outline-offset: 2px;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* 横にスワイプするカード列 */
+@layer components {
+.hscroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-inline: 16px;
+  scrollbar-width: none;
+}
+.hscroll::-webkit-scrollbar {
+  display: none;
+}
+.hscroll > * {
+  scroll-snap-align: start;
+  flex: none;
+}
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
