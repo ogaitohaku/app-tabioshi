@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { DailyQuiz } from "@/components/DailyQuiz";
 import { ForYou } from "@/components/ForYou";
+import { TypeEntry } from "@/components/TypeEntry";
 import { Icon } from "@/components/Icon";
 import { PlaceRow, SampleNote, SectionHead, TripCard } from "@/components/bits";
 import { Visual } from "@/components/Visual";
-import { allAreas, allCreators, allQuizzes, allVideos, getCreator, stays, THEME_LABEL, tripCostPerPerson, videosByCreator, videosInArea } from "@/lib/content";
+import { allAreas, allCreators, allQuizzes, allTravelTypes, allVideos, getCreator, stays, THEME_LABEL, tripCostPerPerson, videosByCreator, videosInArea } from "@/lib/content";
 
 export default function Home() {
   const videos = allVideos();
@@ -46,6 +47,8 @@ export default function Home() {
           </div>
         ))}
       </section>
+
+      <TypeEntry names={Object.fromEntries(allTravelTypes().map((t) => [t.code, t.name]))} />
 
       <ForYou
         trips={videos.map((v) => ({ id: v.id, themes: v.themes, cost: tripCostPerPerson(v.id) }))}

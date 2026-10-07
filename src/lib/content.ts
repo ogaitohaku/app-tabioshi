@@ -1,5 +1,6 @@
 // 画面からはこのファイル経由でデータを読む。データの置き場所(今はファイル、のちにデータベース)を変えても画面は変えずに済む。
 import { areas, creators, learn, places, quizzes, videos } from "@/data/sample";
+import { TYPES } from "@/data/travelType";
 import type { PlaceCategory, Theme } from "@/data/types";
 
 export { IS_SAMPLE } from "@/data/sample";
@@ -54,3 +55,16 @@ export const quizzesFor = (videoId: string) => quizzes.filter((q) => q.videoId =
 /** 旅程の1人あたり合計の目安(宿は1室2名の半額で計算) */
 export const tripCostPerPerson = (videoId: string) =>
   placesInVideo(videoId).reduce((sum, p) => sum + (p.stay ? Math.round(p.stay.pricePerNight / 2) : p.cost), 0);
+
+// 旅タイプ診断(TRAVEL TYPE)
+export { AXES as TYPE_AXES, QUESTIONS as TYPE_QUESTIONS } from "@/data/travelType";
+export { compat as typeCompat, stars as typeStars } from "@/lib/travel-type";
+export const allTravelTypes = () => TYPES;
+export const getTravelType = (code: string) => TYPES.find((t) => t.code === code.toUpperCase());
+
+/** タイプの好きなテーマが多く入っている旅から順に。themes を複数渡すと、二人の両方に合う旅が上に来る */
+export const tripsForThemes = (...wants: Theme[][]) =>
+  videos
+    .map((v) => ({ v, score: wants.reduce((n, w) => n + (v.themes.some((t) => w.includes(t)) ? 2 : 0) + v.themes.filter((t) => w.includes(t)).length, 0) }))
+    .sort((a, b) => b.score - a.score)
+    .map((x) => x.v);
