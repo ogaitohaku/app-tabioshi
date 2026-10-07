@@ -6,8 +6,11 @@ import { BookingButton, BookingDisclosure } from "@/components/BookingButton";
 import { CopyTripButton } from "@/components/CopyTripButton";
 import { PlaceRow, SampleNote } from "@/components/bits";
 import { QuizCard } from "@/components/QuizCard";
+import { RouteMap } from "@/components/RouteMap";
+import { ShareButton } from "@/components/ShareButton";
+import { VideoPlayer } from "@/components/VideoPlayer";
 import { Visual } from "@/components/Visual";
-import { allVideos, getCreator, getVideo, learnFor, placesInVideo, quizzesFor, stayOfVideo, tripCostPerPerson } from "@/lib/content";
+import { allVideos, getArea, getCreator, getVideo, learnFor, placesInVideo, quizzesFor, stayOfVideo, tripCostPerPerson } from "@/lib/content";
 import { timecode, yen } from "@/lib/format";
 
 export const generateStaticParams = () => allVideos().map((v) => ({ id: v.id }));
@@ -25,13 +28,18 @@ export default async function Trip({ params }: PageProps<"/trips/[id]">) {
   const stay = stayOfVideo(v.id);
   const learn = learnFor(v.id);
   const quizzes = quizzesFor(v.id);
+  const area = getArea(v.areaId);
 
   return (
     <main className="pb-10">
-      <div className="relative aspect-[4/3] bg-line">
+      <div className="relative">
         <BackBar overlay />
-        <Visual visual={v.visual} alt={`${v.area}の風景(イメージ)`} />
-        <span className="absolute bottom-3 left-3 rounded-full bg-black/55 px-2.5 py-1 text-xs font-bold text-white">{v.area}</span>
+        <VideoPlayer video={v} />
+        {area && (
+          <Link href={`/areas/${area.id}`} className="absolute bottom-3 left-3 rounded-full bg-black/55 px-2.5 py-1 text-xs font-bold text-white">
+            {v.area}
+          </Link>
+        )}
       </div>
 
       <div className="flex flex-col gap-4 px-4 pt-4">
@@ -48,11 +56,17 @@ export default async function Trip({ params }: PageProps<"/trips/[id]">) {
           <span className="text-xs font-bold text-ink2">この旅の1人あたりの目安</span>
           <span className="num text-lg font-black">{yen(tripCostPerPerson(v.id))}〜</span>
         </div>
-        <CopyTripButton videoId={v.id} />
+        <div className="flex gap-2">
+          <div className="flex-1 [&>button]:w-full">
+            <CopyTripButton videoId={v.id} />
+          </div>
+          <ShareButton title={v.title} path={`/trips/${v.id}`} kind="trip" />
+        </div>
       </div>
 
       <section className="mt-8 flex flex-col gap-3 px-4">
         <h2 className="text-lg font-black">旅程(動画に出てくる順)</h2>
+        <RouteMap stops={stops} />
         <ol className="flex flex-col gap-2.5">
           {stops.map((p, i) => (
             <li key={p.id} className="flex flex-col gap-1">
@@ -66,7 +80,7 @@ export default async function Trip({ params }: PageProps<"/trips/[id]">) {
       {stay?.stay && (
         <section className="mx-4 mt-8 flex flex-col gap-3 rounded-2xl border border-line bg-card p-4">
           <p className="text-sm font-bold">推しが泊まった宿:{stay.name}</p>
-          <BookingButton stay={stay.stay} />
+          <BookingButton stay={stay.stay} placeId={stay.id} />
           <BookingDisclosure />
         </section>
       )}

@@ -1,10 +1,20 @@
 import type { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { BottomNav } from "@/components/BottomNav";
+import { IS_SAMPLE } from "@/lib/content";
+import { SITE_NAME, SITE_URL, TAGLINE } from "@/lib/site";
 import "./globals.css";
 
+const DESCRIPTION = `${TAGLINE}旅インフルエンサーの動画に出てきた宿・お店・回る順番を、自分の旅にできるアプリ。`;
+
 export const metadata: Metadata = {
-  title: { default: "タビオシ", template: "%s | タビオシ" },
-  description: "推しの旅を、そのまま予約。旅インフルエンサーの動画に出てきた宿・お店・回る順番を、自分の旅にできるアプリ。",
+  metadataBase: new URL(SITE_URL),
+  title: { default: SITE_NAME, template: `%s | ${SITE_NAME}` },
+  description: DESCRIPTION,
+  openGraph: { siteName: SITE_NAME, locale: "ja_JP", type: "website", description: DESCRIPTION },
+  twitter: { card: "summary_large_image" },
+  // サンプルデータの間は検索結果に出さない
+  robots: IS_SAMPLE ? { index: false, follow: false } : undefined,
   applicationName: "タビオシ",
   appleWebApp: { capable: true, title: "タビオシ", statusBarStyle: "default" },
   formatDetection: { telephone: false },
@@ -25,6 +35,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           {children}
         </div>
         <BottomNav />
+        <Analytics />
       </body>
     </html>
   );

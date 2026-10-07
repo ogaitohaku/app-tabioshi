@@ -1,9 +1,10 @@
 import type { StayDetail } from "@/data/types";
 import { bookingLink } from "@/lib/booking";
 import { Icon } from "./Icon";
+import { OutLink } from "./OutLink";
 
 /** 予約は外部サイトで行う。予約先が未登録の宿はボタンを押せない状態で出す */
-export function BookingButton({ stay, compact = false }: { stay: StayDetail; compact?: boolean }) {
+export function BookingButton({ stay, placeId, compact = false }: { stay: StayDetail; placeId: string; compact?: boolean }) {
   const link = bookingLink(stay.booking);
   const size = compact ? "h-10 px-4 text-sm" : "h-12 w-full text-base";
   if (!link) {
@@ -14,7 +15,9 @@ export function BookingButton({ stay, compact = false }: { stay: StayDetail; com
     );
   }
   return (
-    <a
+    <OutLink
+      event="booking_click"
+      props={{ place: placeId }}
       href={link.href}
       target="_blank"
       rel="noopener sponsored"
@@ -22,7 +25,7 @@ export function BookingButton({ stay, compact = false }: { stay: StayDetail; com
     >
       {link.label}
       <Icon name="external" className="h-4 w-4" />
-    </a>
+    </OutLink>
   );
 }
 

@@ -1,5 +1,6 @@
 "use client";
 import { useSavedTrips } from "@/lib/saved";
+import { track } from "@/lib/track";
 import { Icon } from "./Icon";
 
 export function CopyTripButton({ videoId, variant = "solid" }: { videoId: string; variant?: "solid" | "glass" }) {
@@ -13,7 +14,10 @@ export function CopyTripButton({ videoId, variant = "solid" }: { videoId: string
         ? "bg-card text-ink ring-1 ring-line"
         : "bg-ink text-white";
   return (
-    <button type="button" onClick={() => toggle(videoId)} aria-pressed={saved} className={`${base} ${look}`}>
+    <button type="button" onClick={() => {
+        if (!saved) track("copy_trip", { trip: videoId });
+        toggle(videoId);
+      }} aria-pressed={saved} className={`${base} ${look}`}>
       <Icon name={saved ? "check" : "copy"} className="h-4 w-4" />
       {saved ? "マイ旅にコピー済み" : "この旅をまるごとコピー"}
     </button>

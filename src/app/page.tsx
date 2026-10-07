@@ -1,8 +1,10 @@
 import Link from "next/link";
+import { DailyQuiz } from "@/components/DailyQuiz";
+import { ForYou } from "@/components/ForYou";
 import { Icon } from "@/components/Icon";
 import { PlaceRow, SampleNote, SectionHead, TripCard } from "@/components/bits";
 import { Visual } from "@/components/Visual";
-import { allCreators, allVideos, stays, videosByCreator } from "@/lib/content";
+import { allAreas, allCreators, allQuizzes, allVideos, getCreator, stays, THEME_LABEL, tripCostPerPerson, videosByCreator, videosInArea } from "@/lib/content";
 
 export default function Home() {
   const videos = allVideos();
@@ -45,6 +47,27 @@ export default function Home() {
         ))}
       </section>
 
+      <ForYou
+        trips={videos.map((v) => ({ id: v.id, themes: v.themes, cost: tripCostPerPerson(v.id) }))}
+        cards={Object.fromEntries(videos.map((v) => [v.id, <TripCard key={v.id} video={v} />]))}
+        themeLabel={THEME_LABEL}
+      />
+
+      <section className="flex flex-col gap-3">
+        <SectionHead title="エリアから探す" sub="推しが歩いた街のガイド" />
+        <div className="grid grid-cols-2 gap-2.5 px-4">
+          {allAreas().map((a) => (
+            <Link key={a.id} href={`/areas/${a.id}`} className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-line">
+              <Visual visual={a.visual} />
+              <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/65 to-transparent px-3 pt-6 pb-2 text-white">
+                <span className="block text-sm font-black">{a.name}</span>
+                <span className="block text-[11px] opacity-85">推しの旅 {videosInArea(a.id).length}本</span>
+              </span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       <section className="flex flex-col gap-3">
         <SectionHead title="旅をまるごとコピー" sub="宿・お店・回る順番がそのまま旅プランに" />
         <div className="hscroll">
@@ -80,10 +103,20 @@ export default function Home() {
         </div>
       </section>
 
+      <DailyQuiz quizzes={allQuizzes()} names={Object.fromEntries(videos.map((v) => [v.id, getCreator(v.creatorId)?.name]))} />
+
       <footer className="flex flex-col gap-2 px-4">
-        <Link href="/about" className="text-xs font-bold text-ink2 underline">
-          タビオシについて・予約のしくみ
-        </Link>
+        <nav className="flex flex-wrap gap-x-4 gap-y-1 text-xs font-bold text-ink2">
+          <Link href="/about" className="underline">
+            タビオシについて・予約のしくみ
+          </Link>
+          <Link href="/terms" className="underline">
+            利用規約
+          </Link>
+          <Link href="/privacy" className="underline">
+            プライバシーポリシー
+          </Link>
+        </nav>
         <SampleNote />
       </footer>
     </main>

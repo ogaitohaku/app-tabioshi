@@ -2,7 +2,7 @@
 // 地名と「予習」の豆知識は実在の土地についての内容です。
 // 本番では、この配列をクリエイターから集めた本物のデータに差し替えます。
 
-import type { Creator, LearnCard, Place, Quiz, Video } from "./types";
+import type { Area, Creator, LearnCard, Place, Quiz, Video } from "./types";
 
 export const IS_SAMPLE = true;
 
@@ -36,9 +36,18 @@ export const creators: Creator[] = [
   },
 ];
 
+export const areas: Area[] = [
+  { id: "beppu", name: "大分・別府", pref: "大分", intro: "街のあちこちから湯けむりが上がる温泉の街。地獄めぐりと、温泉の蒸気で蒸す料理が名物です。", visual: { scene: "onsen", seed: 501 } },
+  { id: "onomichi", name: "広島・尾道", pref: "広島", intro: "坂道と猫と瀬戸内の海。しまなみ海道の入り口で、尾道ラーメンも有名です。", visual: { scene: "sea", seed: 502 } },
+  { id: "aizu", name: "福島・奥会津", pref: "福島", intro: "只見線が雪の鉄橋を渡る山あいの地域。民宿の囲炉裏ごはんと会津塗の器。", visual: { scene: "snow", seed: 503 } },
+  { id: "otaru", name: "北海道・小樽", pref: "北海道", intro: "ガス灯がともる運河と石造りの倉庫。ガラス工房と海鮮の街です。", visual: { scene: "canal", seed: 504 } },
+];
+
 export const videos: Video[] = [
   {
     id: "beppu",
+    areaId: "beppu",
+    themes: ["onsen", "food"],
     creatorId: "minato",
     title: "別府で湯けむり1泊2日。地獄めぐりと蒸し料理",
     caption: "湯けむりの街で、蒸し料理と源泉かけ流し。1泊2日のぜんぶ。",
@@ -51,6 +60,8 @@ export const videos: Video[] = [
   },
   {
     id: "onomichi",
+    areaId: "onomichi",
+    themes: ["sea", "town", "food"],
     creatorId: "saki",
     title: "1万円台で尾道・しまなみ弾丸。坂と猫とラーメン",
     caption: "宿4,500円。坂を登って猫に会って、ラーメンで締める弾丸旅。",
@@ -63,6 +74,8 @@ export const videos: Video[] = [
   },
   {
     id: "tadami",
+    areaId: "aizu",
+    themes: ["snow", "train", "craft"],
     creatorId: "tetsu",
     title: "只見線で雪の鉄橋へ。民宿で囲炉裏ごはん",
     caption: "雪の鉄橋を渡る列車を待つ。そのあと囲炉裏で岩魚。",
@@ -75,6 +88,8 @@ export const videos: Video[] = [
   },
   {
     id: "otaru",
+    areaId: "otaru",
+    themes: ["town", "craft", "food"],
     creatorId: "minato",
     title: "冬の小樽。運河の夜景とガラス工房で一日",
     caption: "ガス灯がともる運河を歩いて、ガラスのグラスを作った日。",
