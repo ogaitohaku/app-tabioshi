@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { LegalPage } from "@/components/LegalPage";
+import { COMPANY } from "@/lib/company";
 
 // 専門家(弁護士など)の確認が済むまでは「案」。検索エンジンに載せない
 export const metadata: Metadata = { title: "利用規約(案)", robots: { index: false, follow: false } };
@@ -13,7 +14,8 @@ export default function Terms() {
         [
           "第1条(この規約について)",
           [
-            "この規約は、株式会社OGA(Open Guild Association)(以下「運営者」)が提供する「タビオシ」(以下「本サービス」)の利用条件を定めるものです。本サービスを利用した方は、この規約に同意したものとみなします。",
+            `この規約は、${COMPANY.name}(以下「運営者」)が提供する「タビオシ」(以下「本サービス」)の利用条件を定めるものです。本サービスを利用した方は、この規約に同意したものとみなします。`,
+            `利用できる年齢:${COMPANY.minAge}。未成年の方は、保護者の同意を得てから利用してください。`,
           ],
         ],
         [
@@ -54,18 +56,9 @@ export default function Terms() {
         ["第9条(規約の変更)", ["運営者は、必要に応じてこの規約を変更できます。変更後の規約は、本サービス上に掲載した時点から効力を持ちます。"]],
         [
           "第10条(準拠法・管轄)",
-          [
-            "この規約は日本法に従って解釈します。本サービスに関して争いが生じた場合は、【要確認:管轄裁判所(案は東京地方裁判所)。消費者との関係で専属的合意管轄とすることの妥当性】を第一審の専属的合意管轄裁判所とします。",
-          ],
+          [`この規約は日本法に従って解釈します。本サービスに関して争いが生じた場合は、${COMPANY.court}を第一審の専属的合意管轄裁判所とします。`],
         ],
-        [
-          "お問い合わせ",
-          [
-            "株式会社OGA(Open Guild Association) 代表取締役 板崎 日菜",
-            "所在地:東京都中央区銀座【要確認:番地・建物名】",
-            "お問い合わせ:info@openguild.jp(電話番号は【要確認:掲載するか】)",
-          ],
-        ],
+        ["お問い合わせ", [`${COMPANY.name} ${COMPANY.representative}`, `所在地:${COMPANY.address}`, `お問い合わせ:${COMPANY.email}`]],
       ]}
     />
   );

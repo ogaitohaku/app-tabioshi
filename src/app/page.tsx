@@ -118,7 +118,7 @@ export default function Home() {
       <DailyQuiz quizzes={allQuizzes()} names={Object.fromEntries(videos.map((v) => [v.id, getCreator(v.creatorId)?.name]))} />
 
       <footer className="flex flex-col gap-2 px-4">
-        <nav className="flex flex-wrap gap-x-4 gap-y-1 text-xs font-bold text-ink2">
+        <nav className="flex flex-wrap gap-x-4 text-xs font-bold text-ink2 [&>a]:inline-flex [&>a]:min-h-11 [&>a]:items-center">
           <Link href="/welcome" className="underline">
             はじめての方へ
           </Link>
@@ -130,6 +130,9 @@ export default function Home() {
           </Link>
           <Link href="/privacy" className="underline">
             プライバシーポリシー
+          </Link>
+          <Link href="/tokushoho" className="underline">
+            特定商取引法に基づく表示
           </Link>
         </nav>
         <SampleNote />
