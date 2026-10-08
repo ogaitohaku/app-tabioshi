@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { LegalPage } from "@/components/LegalPage";
+import { COMPANY } from "@/lib/company";
 
 // 専門家(弁護士など)の確認が済むまでは「案」。検索エンジンに載せない
 export const metadata: Metadata = { title: "プライバシーポリシー(案)", robots: { index: false, follow: false } };
@@ -10,12 +11,7 @@ export default function Privacy() {
       title="プライバシーポリシー(案)"
       updated="【要記入:公開日】"
       sections={[
-        [
-          "基本方針",
-          [
-            "株式会社OGA(Open Guild Association)(以下「運営者」)は、「タビオシ」(以下「本サービス」)の利用者の情報を、個人情報保護法などの法令に従って適切に扱います。",
-          ],
-        ],
+        ["基本方針", [`${COMPANY.name}(以下「運営者」)は、「タビオシ」(以下「本サービス」)の利用者の情報を、個人情報保護法などの法令に従って適切に扱います。`]],
         [
           "集める情報",
           [
@@ -34,16 +30,10 @@ export default function Privacy() {
             "・予約サイト(楽天トラベルなど):予約ボタンを押して移動した先のサイトで、紹介料の計算のための情報が扱われます。各サイトのプライバシーポリシーをご確認ください。",
           ],
         ],
+        ["未成年の方の利用", [`利用できる年齢:${COMPANY.minAge}。未成年の方は、保護者の同意を得てから利用してください。`]],
         ["第三者への提供", ["法令に基づく場合を除き、本人の同意なく個人情報を第三者に提供しません。"]],
         ["このポリシーの変更", ["必要に応じて内容を変更します。変更後の内容は、本サービス上に掲載した時点から効力を持ちます。"]],
-        [
-          "お問い合わせ",
-          [
-            "株式会社OGA(Open Guild Association) 個人情報の取り扱い窓口【要確認:窓口の名称・担当部署】",
-            "所在地:東京都中央区銀座【要確認:番地・建物名】",
-            "メール:info@openguild.jp",
-          ],
-        ],
+        ["お問い合わせ", [COMPANY.privacyDesk, `所在地:${COMPANY.address}`, `メール:${COMPANY.email}`]],
       ]}
     />
   );

@@ -13,6 +13,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...allTravelTypes().map((t) => `/type/${t.code}`),
     "/terms",
     "/privacy",
+    "/tokushoho",
     ...allAreas().map((a) => `/areas/${a.id}`),
     ...allVideos().map((v) => `/trips/${v.id}`),
     ...allPlaces().map((p) => `/places/${p.id}`),

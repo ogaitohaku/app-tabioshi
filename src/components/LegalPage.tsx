@@ -1,4 +1,11 @@
+import Link from "next/link";
 import { BackBar } from "./BackBar";
+
+const DOCS: [string, string][] = [
+  ["/terms", "利用規約"],
+  ["/privacy", "プライバシーポリシー"],
+  ["/tokushoho", "特定商取引法に基づく表示"],
+];
 
 /** 利用規約・プライバシーポリシーなどの文書ページ */
 export function LegalPage({ title, updated, sections }: { title: string; updated: string; sections: [string, string[]][] }) {
@@ -23,6 +30,13 @@ export function LegalPage({ title, updated, sections }: { title: string; updated
             ))}
           </section>
         ))}
+        <nav aria-label="規約・ポリシー" className="flex flex-col border-t border-line pt-2">
+          {DOCS.map(([href, label]) => (
+            <Link key={href} href={href} className="flex min-h-11 items-center text-sm font-bold text-ink2 underline">
+              {label}
+            </Link>
+          ))}
+        </nav>
       </article>
     </main>
   );
