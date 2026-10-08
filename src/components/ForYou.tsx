@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useState, type ReactNode } from "react";
 import type { Theme } from "@/data/types";
 import { BUDGET_LABEL, rankTrips, usePrefs, type Budget, type TripFacts } from "@/lib/prefs";
@@ -25,6 +26,9 @@ export function ForYou({ trips, cards, themeLabel }: { trips: TripFacts[]; cards
           <p className="text-[11px] font-bold tracking-widest text-shu">あなた向け</p>
           <h2 className="text-lg font-black">好きな旅を教えてください</h2>
           <p className="text-xs text-white/70">答えはこのスマホの中だけに保存します。</p>
+          <Link href="/type" className="mt-1 inline-block text-xs font-bold text-shu underline">
+            旅タイプ診断で決める(20問・約2分)
+          </Link>
         </div>
         <fieldset className="flex flex-col gap-2">
           <legend className="mb-2 text-sm font-bold">1. 好きなものは?(いくつでも)</legend>

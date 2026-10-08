@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { allAreas, allCreators, allPlaces, allVideos } from "@/lib/content";
+import { allAreas, allCreators, allPlaces, allTravelTypes, allVideos } from "@/lib/content";
 import { SITE_URL } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -8,6 +8,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/shorts",
     "/map",
     "/about",
+    "/type",
+    ...allTravelTypes().map((t) => `/type/${t.code}`),
     "/terms",
     "/privacy",
     ...allAreas().map((a) => `/areas/${a.id}`),

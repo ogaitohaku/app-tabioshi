@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { SavedTrips } from "./SavedTrips";
-import { allVideos } from "@/lib/content";
+import { TypeEntry } from "@/components/TypeEntry";
+import { allTravelTypes, allVideos } from "@/lib/content";
 
 export const metadata: Metadata = { title: "マイ旅" };
 
@@ -10,6 +11,9 @@ export default function MyTrips() {
       <h1 className="text-2xl font-black">マイ旅</h1>
       <p className="text-sm text-ink2">「この旅をまるごとコピー」した旅がここに並びます。</p>
       <SavedTrips videos={allVideos()} />
+      <div className="-mx-4 mt-4">
+        <TypeEntry names={Object.fromEntries(allTravelTypes().map((t) => [t.code, t.name]))} />
+      </div>
     </main>
   );
 }
