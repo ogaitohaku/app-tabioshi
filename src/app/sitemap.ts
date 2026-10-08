@@ -7,6 +7,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/",
     "/shorts",
     "/map",
+    "/welcome",
     "/about",
     "/type",
     ...allTravelTypes().map((t) => `/type/${t.code}`),

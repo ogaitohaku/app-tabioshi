@@ -56,7 +56,7 @@ export function RouteMap({ stops }: { stops: Place[] }) {
           href={gmaps}
           target="_blank"
           rel="noopener"
-          className="inline-flex shrink-0 items-center gap-1 rounded-full border border-line bg-card px-3 py-1.5 text-xs font-bold"
+          className="inline-flex h-11 shrink-0 items-center gap-1 rounded-full border border-line bg-card px-3 text-xs font-bold"
         >
           Googleマップで道順
           <Icon name="external" className="h-3 w-3" />

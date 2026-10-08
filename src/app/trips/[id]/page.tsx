@@ -37,7 +37,10 @@ export default async function Trip({ params }: PageProps<"/trips/[id]">) {
 
       <div className="flex flex-col gap-4 px-4 pt-4">
         {area && (
-          <Link href={`/areas/${area.id}`} className="w-fit rounded-full bg-wash px-2.5 py-1 text-xs font-bold text-ink2 ring-1 ring-line">
+          <Link
+            href={`/areas/${area.id}`}
+            className="inline-flex h-11 w-fit items-center rounded-full bg-wash px-4 text-xs font-bold text-ink2 ring-1 ring-line"
+          >
             {v.area}のエリアガイド
           </Link>
         )}
@@ -60,6 +63,13 @@ export default async function Trip({ params }: PageProps<"/trips/[id]">) {
           </div>
           <ShareButton title={v.title} path={`/trips/${v.id}`} kind="trip" />
         </div>
+        <p className="-mt-2 text-xs text-mute">
+          コピーした旅は
+          <Link href="/me" className="font-bold text-shu underline">
+            マイ旅
+          </Link>
+          に保存されます(いまはこの端末の中だけ)。
+        </p>
       </div>
 
       <section className="mt-8 flex flex-col gap-3 px-4">

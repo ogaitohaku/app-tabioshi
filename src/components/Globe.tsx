@@ -329,18 +329,18 @@ export function Globe({ videos, places }: { videos: Video[]; places: Place[] }) 
           ))}
         </div>
         <div className="absolute top-3 right-3 left-3 flex items-center justify-between gap-2">
-          <span className="truncate rounded-full bg-white/95 px-3 py-1.5 text-xs font-bold shadow">
+          <span className="truncate rounded-full bg-white px-3 py-1.5 text-xs font-bold shadow">
             {areaVideo ? `${areaVideo.area} ・ ${areaPlaces.length}スポット` : `推しが行った場所 ・ ${videos.length}エリア`}
           </span>
-          <button type="button" onClick={() => api.current?.japan()} className="shrink-0 rounded-full bg-white/95 px-3 py-1.5 text-xs font-bold shadow">
+          <button type="button" onClick={() => api.current?.japan()} className="flex h-11 shrink-0 items-center rounded-full bg-white px-4 text-xs font-bold shadow">
             日本全体
           </button>
         </div>
         <div className="absolute right-3 bottom-8 flex flex-col overflow-hidden rounded-xl bg-white shadow">
-          <button type="button" aria-label="拡大" onClick={() => api.current?.zoom(2)} className="grid h-10 w-10 place-items-center border-b border-line">
+          <button type="button" aria-label="拡大" onClick={() => api.current?.zoom(2)} className="grid h-11 w-11 place-items-center border-b border-line">
             <Icon name="plus" />
           </button>
-          <button type="button" aria-label="縮小" onClick={() => api.current?.zoom(0.5)} className="grid h-10 w-10 place-items-center">
+          <button type="button" aria-label="縮小" onClick={() => api.current?.zoom(0.5)} className="grid h-11 w-11 place-items-center">
             <Icon name="minus" />
           </button>
         </div>

@@ -38,7 +38,7 @@ export function QuizCard({
                 setPicked(i);
                 onAnswer?.(i, i === quiz.answer);
               }}
-              className={`flex items-center gap-2 rounded-xl border px-3 py-2.5 text-left text-sm ${
+              className={`flex min-h-11 items-center gap-2 rounded-xl border px-3 py-2.5 text-left text-sm ${
                 isAns ? "border-ink2 bg-wash font-bold" : isWrong ? "border-shu bg-shu-soft" : "border-line"
               }`}
             >

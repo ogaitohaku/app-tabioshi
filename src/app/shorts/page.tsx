@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { PrBadge } from "@/components/bits";
 import { CopyTripButton } from "@/components/CopyTripButton";
 import { Icon } from "@/components/Icon";
 import { Visual } from "@/components/Visual";
-import { allVideos, getCreator, stayOfVideo } from "@/lib/content";
+import { allVideos, getCreator, IS_SAMPLE, stayOfVideo } from "@/lib/content";
 import { yen } from "@/lib/format";
 
 export const metadata: Metadata = { title: "旅ショート" };
@@ -28,8 +29,11 @@ export default function Shorts() {
                 <span className="h-9 w-9 shrink-0 overflow-hidden rounded-full ring-1 ring-line">{c && <Visual visual={c.visual} />}</span>
                 <span className="truncate text-sm font-bold">{c?.name}</span>
               </Link>
-              <span className="num shrink-0 text-xs text-mute">
-                {i + 1} / {videos.length}
+              <span className="flex shrink-0 items-center gap-2 text-xs text-mute">
+                {IS_SAMPLE && <span className="rounded-full bg-wash px-2 py-0.5 font-bold text-ink2 ring-1 ring-line">サンプル</span>}
+                <span className="num">
+                  {i + 1} / {videos.length}
+                </span>
               </span>
             </div>
 
@@ -59,13 +63,17 @@ export default function Shorts() {
             </div>
 
             <p className="line-clamp-2 text-sm leading-relaxed">{v.caption}</p>
+            {i === 0 && videos.length > 1 && <p className="-mt-1 text-xs text-mute">上にスワイプすると、次の旅に切り替わります。</p>}
             {stay?.stay && (
               <Link href={`/places/${stay.id}`} className="flex items-center gap-3 rounded-xl border border-line bg-card p-2">
                 <span className="h-11 w-11 shrink-0 overflow-hidden rounded-lg">
                   <Visual visual={stay.visual} />
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-bold">{stay.name}</span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="truncate text-sm font-bold">{stay.name}</span>
+                    {stay.sponsored && <PrBadge />}
+                  </span>
                   <span className="block text-xs text-mute">
                     {stay.stay.kind} ・ 1人 <span className="num">{yen(stay.stay.pricePerNight / 2)}</span>〜
                   </span>

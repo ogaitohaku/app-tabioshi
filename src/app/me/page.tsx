@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { SavedTrips } from "./SavedTrips";
+import { SampleNote } from "@/components/bits";
 import { TypeEntry } from "@/components/TypeEntry";
 import { allTravelTypes, allVideos } from "@/lib/content";
 
@@ -14,6 +15,7 @@ export default function MyTrips() {
       <div className="-mx-4 mt-4">
         <TypeEntry names={Object.fromEntries(allTravelTypes().map((t) => [t.code, t.name]))} />
       </div>
+      <SampleNote />
     </main>
   );
 }

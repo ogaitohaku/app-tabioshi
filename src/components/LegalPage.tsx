@@ -10,7 +10,7 @@ export function LegalPage({ title, updated, sections }: { title: string; updated
           <h1 className="text-2xl font-bold">{title}</h1>
           <p className="text-xs text-mute">最終更新日:{updated}</p>
           <p className="rounded-xl bg-shu-soft p-3 text-xs leading-relaxed text-ink2">
-            これは公開前の下書きです。〔 〕の部分を埋め、正式に公開する前に弁護士などの専門家に確認してもらってください。
+            これは公開前の案です(専門家の確認前)。【要記入】は内容を書き入れる箇所、【要確認】は事実や方針を確かめる箇所です。正式に公開する前に、弁護士などの専門家に確認してもらってください。
           </p>
         </header>
         {sections.map(([h, paras]) => (

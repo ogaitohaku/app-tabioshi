@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { DailyQuiz } from "@/components/DailyQuiz";
+import { FirstVisit } from "@/components/FirstVisit";
 import { ForYou } from "@/components/ForYou";
+import { HowItWorks } from "@/components/HowItWorks";
 import { TypeEntry } from "@/components/TypeEntry";
 import { Icon } from "@/components/Icon";
 import { PlaceRow, SampleNote, SectionHead, TripCard } from "@/components/bits";
@@ -12,6 +14,7 @@ import {
   allTravelTypes,
   allVideos,
   getCreator,
+  IS_SAMPLE,
   stays,
   THEME_LABEL,
   tripCostPerPerson,
@@ -42,20 +45,14 @@ export default function Home() {
         </Link>
       </header>
 
-      <section aria-labelledby="how" className="mx-4 grid grid-cols-3 rounded-xl border border-line bg-card">
+      <FirstVisit sample={IS_SAMPLE} />
+
+      <section aria-labelledby="how" className="mx-4 flex flex-col gap-2">
         <h2 id="how" className="sr-only">
           使い方
         </h2>
-        {[
-          ["見る", "推しの旅動画を見る"],
-          ["写す", "旅をまるごとコピー"],
-          ["行く", "同じ宿を予約"],
-        ].map(([k, t], i) => (
-          <div key={k} className={`px-3 py-3 ${i ? "border-l border-dashed border-line" : ""}`}>
-            <p className="text-xs font-bold tracking-widest text-mute">STEP {i + 1}</p>
-            <p className={`text-sm leading-snug font-bold ${i === 2 ? "text-shu" : ""}`}>{t}</p>
-          </div>
-        ))}
+        <HowItWorks compact />
+        <p className="text-xs leading-relaxed text-mute">予約と支払いは、移動先の予約サイトで行います。タビオシでは受け付けていません。</p>
       </section>
 
       <TypeEntry names={Object.fromEntries(allTravelTypes().map((t) => [t.code, t.name]))} />
@@ -122,6 +119,9 @@ export default function Home() {
 
       <footer className="flex flex-col gap-2 px-4">
         <nav className="flex flex-wrap gap-x-4 gap-y-1 text-xs font-bold text-ink2">
+          <Link href="/welcome" className="underline">
+            はじめての方へ
+          </Link>
           <Link href="/about" className="underline">
             タビオシについて・予約のしくみ
           </Link>

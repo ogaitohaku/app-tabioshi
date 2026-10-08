@@ -6,7 +6,7 @@ import { OutLink } from "./OutLink";
 /** 予約は外部サイトで行う。予約先が未登録の宿はボタンを押せない状態で出す */
 export function BookingButton({ stay, placeId, compact = false }: { stay: StayDetail; placeId: string; compact?: boolean }) {
   const link = bookingLink(stay.booking);
-  const size = compact ? "h-10 px-4 text-sm" : "h-12 w-full text-base";
+  const size = compact ? "h-11 px-4 text-sm" : "h-12 w-full text-base";
   if (!link) {
     return (
       <span aria-disabled="true" className={`inline-flex items-center justify-center rounded-full bg-line font-bold text-mute ${size}`}>
@@ -32,7 +32,7 @@ export function BookingButton({ stay, placeId, compact = false }: { stay: StayDe
 export function BookingDisclosure() {
   return (
     <p className="text-xs leading-relaxed text-mute">
-      予約は楽天トラベルなど外部の予約サイトで行います。予約が成立すると、タビオシと旅を紹介したクリエイターが紹介料を受け取ります。料金はどこから予約しても同じです。
+      予約は楽天トラベルなど外部の予約サイトで行います。予約が成立すると、タビオシと旅を紹介したクリエイターが紹介料を受け取ります。紹介リンクを使っても、予約サイトでの料金が上がることはありません。
     </p>
   );
 }

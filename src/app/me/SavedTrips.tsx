@@ -14,7 +14,7 @@ export function SavedTrips({ videos }: { videos: Video[] }) {
         <Icon name="bookmark" className="h-8 w-8 text-mute" />
         <p className="font-bold">まだコピーした旅はありません</p>
         <p className="text-sm text-ink2">旅ショートで気になった旅を見つけたら、「この旅をまるごとコピー」を押してください。</p>
-        <Link href="/shorts" className="mt-1 rounded-full bg-shu px-5 py-2.5 text-sm font-bold text-white">
+        <Link href="/shorts" className="mt-1 inline-flex h-11 items-center rounded-full bg-shu px-5 text-sm font-bold text-white">
           旅ショートを見る
         </Link>
       </div>
