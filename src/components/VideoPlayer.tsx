@@ -31,12 +31,17 @@ export function VideoPlayer({ video }: { video: Video }) {
       <Visual visual={video.visual} alt={`${video.area}の風景(イメージ)`} />
       {src?.youtubeId ? (
         <button type="button" onClick={() => setPlaying(true)} className="absolute inset-0 grid place-items-center" aria-label="動画を再生">
-          <span className="grid h-16 w-16 place-items-center rounded-full bg-black/60 text-white ring-2 ring-white/70">
+          <span className="grid h-16 w-16 place-items-center rounded-full bg-white text-shu ring-1 ring-line">
             <Icon name="play" fill className="ml-1 h-7 w-7" />
           </span>
         </button>
       ) : src ? (
-        <a href={src.url} target="_blank" rel="noopener" className="absolute right-3 bottom-3 inline-flex items-center gap-1.5 rounded-full bg-black/60 px-3 py-1.5 text-xs font-bold text-white">
+        <a
+          href={src.url}
+          target="_blank"
+          rel="noopener"
+          className="absolute right-3 bottom-3 inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-xs font-bold text-ink ring-1 ring-line"
+        >
           <Icon name="play" fill className="h-3.5 w-3.5" />
           {LABEL[src.platform]}で見る
         </a>

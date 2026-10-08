@@ -29,26 +29,32 @@ export default async function CreatorPage({ params }: PageProps<"/creators/[id]"
         <span className="h-24 w-24 overflow-hidden rounded-full ring-4 ring-shu ring-offset-2">
           <Visual visual={c.visual} />
         </span>
-        <h1 className="text-2xl font-black">{c.name}</h1>
+        <h1 className="text-2xl font-bold">{c.name}</h1>
         <p className="text-sm text-mute">{c.genre}</p>
         <p className="max-w-xs text-sm leading-relaxed text-ink2">{c.bio}</p>
         <ShareButton title={`${c.name}の旅`} path={`/creators/${c.id}`} kind="creator" />
-        <dl className="grid w-full grid-cols-3 rounded-2xl border border-line bg-card py-3">
+        <dl className="grid w-full grid-cols-3 rounded-xl border border-line bg-card py-3">
           {[
             ["旅", `${vids.length}本`],
             ["スポット", `${spots}か所`],
             ["フォロワー", c.followers],
           ].map(([k, val]) => (
             <div key={k}>
-              <dt className="text-[11px] text-mute">{k}</dt>
-              <dd className="num font-black">{val}</dd>
+              <dt className="text-xs text-mute">{k}</dt>
+              <dd className="num font-bold">{val}</dd>
             </div>
           ))}
         </dl>
         {c.links.length > 0 && (
           <div className="flex flex-wrap justify-center gap-2">
             {c.links.map((l) => (
-              <a key={l.url} href={l.url} target="_blank" rel="noopener" className="inline-flex items-center gap-1 rounded-full border border-line px-3 py-1.5 text-xs font-bold">
+              <a
+                key={l.url}
+                href={l.url}
+                target="_blank"
+                rel="noopener"
+                className="inline-flex items-center gap-1 rounded-full border border-line px-3 py-1.5 text-xs font-bold"
+              >
                 {PLATFORM_LABEL[l.platform]}
                 <Icon name="external" className="h-3 w-3" />
               </a>
@@ -58,7 +64,7 @@ export default async function CreatorPage({ params }: PageProps<"/creators/[id]"
       </div>
 
       <section className="mt-8 flex flex-col gap-4 px-4">
-        <h2 className="text-lg font-black">{c.name}の旅</h2>
+        <h2 className="text-lg font-bold">{c.name}の旅</h2>
         {vids.map((v) => (
           <TripCard key={v.id} video={v} wide />
         ))}

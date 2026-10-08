@@ -47,24 +47,24 @@ export default async function TypeResult({ params }: PageProps<"/type/[code]">) 
             const left = t.code[i] === a.left;
             return (
               <div key={a.id} className="flex flex-col items-center gap-0.5 rounded-xl border border-line bg-card px-1 py-2 text-center">
-                <span className="num text-xl font-black text-shu">{t.code[i]}</span>
-                <span className="text-[10px] leading-tight font-bold">{left ? a.leftLabel : a.rightLabel}</span>
+                <span className="num text-xl font-bold text-shu">{t.code[i]}</span>
+                <span className="text-xs leading-tight font-bold">{left ? a.leftLabel : a.rightLabel}</span>
               </div>
             );
           })}
         </section>
 
         <section className="flex flex-col gap-3">
-          <div className="flex flex-col gap-1.5 rounded-2xl border border-line bg-card p-4">
-            <h2 className="text-sm font-black text-moss">強み</h2>
+          <div className="flex flex-col gap-1.5 rounded-xl border border-line bg-card p-4">
+            <h2 className="text-sm font-bold text-ink">強み</h2>
             <ul className="flex flex-col gap-1 text-sm">
               {t.strengths.map((s) => (
                 <li key={s}>・{s}</li>
               ))}
             </ul>
           </div>
-          <div className="flex flex-col gap-1.5 rounded-2xl border border-line bg-card p-4">
-            <h2 className="text-sm font-black text-sea">ちょっと弱いところ</h2>
+          <div className="flex flex-col gap-1.5 rounded-xl border border-line bg-card p-4">
+            <h2 className="text-sm font-bold text-ink">ちょっと弱いところ</h2>
             <ul className="flex flex-col gap-1 text-sm">
               {t.weaknesses.map((s) => (
                 <li key={s}>・{s}</li>
@@ -83,25 +83,31 @@ export default async function TypeResult({ params }: PageProps<"/type/[code]">) 
         </dl>
 
         <section aria-labelledby="aruaru" className="flex flex-col gap-2">
-          <h2 id="aruaru" className="text-lg font-black">{t.name}あるある</h2>
+          <h2 id="aruaru" className="text-lg font-bold">
+            {t.name}あるある
+          </h2>
           <ol className="flex flex-col gap-1.5">
             {t.aruaru.map((s, i) => (
               <li key={s} className="flex gap-3 rounded-xl bg-card px-3 py-2.5 text-sm ring-1 ring-line">
-                <span className="num font-black text-shu">{i + 1}</span>
+                <span className="num font-bold text-shu">{i + 1}</span>
                 {s}
               </li>
             ))}
           </ol>
         </section>
 
-        <section aria-labelledby="guardian" className="flex flex-col gap-1.5 rounded-2xl bg-moss-soft p-4">
-          <h2 id="guardian" className="text-sm font-black text-moss">守護重神(準備中)</h2>
+        <section aria-labelledby="guardian" className="flex flex-col gap-1.5 rounded-xl bg-wash p-4">
+          <h2 id="guardian" className="text-sm font-bold text-ink">
+            守護重神(準備中)
+          </h2>
           <p className="text-sm font-bold">{t.guardian.trait}</p>
           <p className="text-xs text-ink2">{t.guardian.why}</p>
         </section>
 
         <section aria-labelledby="trips" className="flex flex-col gap-3">
-          <h2 id="trips" className="text-lg font-black">{t.name}におすすめの旅</h2>
+          <h2 id="trips" className="text-lg font-bold">
+            {t.name}におすすめの旅
+          </h2>
           {trips.map((v) => (
             <TripCard key={v.id} video={v} wide />
           ))}
@@ -109,23 +115,25 @@ export default async function TypeResult({ params }: PageProps<"/type/[code]">) 
 
         <section aria-labelledby="compat" className="flex flex-col gap-3">
           <div>
-            <h2 id="compat" className="text-lg font-black">ほかのタイプとの旅の相性</h2>
+            <h2 id="compat" className="text-lg font-bold">
+              ほかのタイプとの旅の相性
+            </h2>
             <p className="text-xs text-mute">友だちのタイプを選ぶと、場面ごとの相性と二人に合う旅が出ます</p>
           </div>
-          <ul className="flex flex-col divide-y divide-line rounded-2xl border border-line bg-card">
+          <ul className="flex flex-col divide-y divide-line rounded-xl border border-line bg-card">
             {others.map((x) => (
               <li key={x.code}>
                 <Link href={`/type/${t.code}/${x.code}`} className="flex items-center gap-3 px-4 py-2.5">
-                  <span className="num w-12 text-xs font-black text-shu">{x.code}</span>
+                  <span className="num w-12 text-xs font-bold text-shu">{x.code}</span>
                   <span className="min-w-0 flex-1 truncate text-sm font-bold">{x.name}</span>
-                  <span className="shrink-0 text-[11px] text-mute">{x.c.title}</span>
+                  <span className="shrink-0 text-xs text-mute">{x.c.title}</span>
                 </Link>
               </li>
             ))}
           </ul>
         </section>
 
-        <p className="text-[11px] leading-relaxed text-mute">娯楽と自己理解のための診断です。性格検査や医学的な診断ではありません。</p>
+        <p className="text-xs leading-relaxed text-mute">娯楽と自己理解のための診断です。性格検査や医学的な診断ではありません。</p>
       </div>
     </main>
   );

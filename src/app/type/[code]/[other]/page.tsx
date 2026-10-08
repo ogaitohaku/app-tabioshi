@@ -13,7 +13,10 @@ export async function generateMetadata({ params }: PageProps<"/type/[code]/[othe
   const a = getTravelType(code);
   const b = getTravelType(other);
   if (!a || !b) return {};
-  return { title: `${a.name} × ${b.name} の旅の相性`, description: `${a.code}と${b.code}は「${typeCompat(a.code, b.code).title}」。場面ごとの相性と、二人に合う旅。` };
+  return {
+    title: `${a.name} × ${b.name} の旅の相性`,
+    description: `${a.code}と${b.code}は「${typeCompat(a.code, b.code).title}」。場面ごとの相性と、二人に合う旅。`,
+  };
 }
 
 export default async function TypeCompat({ params }: PageProps<"/type/[code]/[other]">) {
@@ -28,18 +31,20 @@ export default async function TypeCompat({ params }: PageProps<"/type/[code]/[ot
     <main className="pb-10">
       <BackBar title="旅の相性" />
       <div className="flex flex-col gap-6 px-4 pt-5">
-        <header className="flex flex-col items-center gap-3 rounded-3xl bg-ink px-4 py-6 text-center text-white">
+        <header className="flex flex-col items-center gap-3 rounded-xl border border-line bg-wash px-4 py-6 text-center">
           <div className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-2">
             {[a, b].map((t, i) => (
               <Link key={i} href={`/type/${t.code}`} className={`flex flex-col gap-0.5 ${i ? "col-start-3" : ""}`}>
-                <span className="num text-2xl font-black tracking-widest text-shu">{t.code}</span>
+                <span className="num text-2xl font-bold tracking-widest text-shu">{t.code}</span>
                 <span className="text-xs leading-tight font-bold">{t.name}</span>
               </Link>
             ))}
-            <span aria-hidden className="col-start-2 row-start-1 text-lg text-white/60">×</span>
+            <span aria-hidden className="col-start-2 row-start-1 text-lg text-ink2">
+              ×
+            </span>
           </div>
-          <p className="text-xs text-white/70">二人の旅は</p>
-          <h1 className="text-2xl font-black">{title}</h1>
+          <p className="text-xs text-ink2">二人の旅は</p>
+          <h1 className="text-2xl font-bold">{title}</h1>
         </header>
 
         <section aria-labelledby="rows" className="flex flex-col gap-2">
@@ -47,9 +52,9 @@ export default async function TypeCompat({ params }: PageProps<"/type/[code]/[ot
             場面ごとの相性
           </h2>
           {rows.map((r) => (
-            <div key={r.label} className="flex flex-col gap-1 rounded-2xl border border-line bg-card px-4 py-3">
+            <div key={r.label} className="flex flex-col gap-1 rounded-xl border border-line bg-card px-4 py-3">
               <div className="flex items-center justify-between gap-3">
-                <h3 className="text-sm font-black">{r.label}</h3>
+                <h3 className="text-sm font-bold">{r.label}</h3>
                 <span aria-label={`5段階の${r.level}`} className="tracking-[0.15em] text-shu">
                   {"●".repeat(r.level)}
                   <span className="text-shu/25">{"●".repeat(5 - r.level)}</span>
@@ -66,7 +71,9 @@ export default async function TypeCompat({ params }: PageProps<"/type/[code]/[ot
         </div>
 
         <section aria-labelledby="trips" className="flex flex-col gap-3">
-          <h2 id="trips" className="text-lg font-black">二人に合う旅</h2>
+          <h2 id="trips" className="text-lg font-bold">
+            二人に合う旅
+          </h2>
           {trips.map((v) => (
             <TripCard key={v.id} video={v} wide />
           ))}

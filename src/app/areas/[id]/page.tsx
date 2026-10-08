@@ -27,18 +27,18 @@ export default async function AreaPage({ params }: PageProps<"/areas/[id]">) {
 
   return (
     <main className="pb-10">
+      <BackBar />
       <div className="relative aspect-[16/10] bg-line">
-        <BackBar overlay />
         <Visual visual={a.visual} alt={`${a.name}の風景(イメージ)`} />
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent px-4 pt-10 pb-4 text-white">
-          <p className="text-xs font-bold opacity-80">エリアガイド</p>
-          <h1 className="text-2xl font-black">{a.name}</h1>
-        </div>
       </div>
 
       <div className="flex flex-col gap-3 px-4 pt-4">
+        <div>
+          <p className="text-xs font-bold text-mute">エリアガイド</p>
+          <h1 className="text-2xl font-bold">{a.name}</h1>
+        </div>
         <p className="text-sm leading-relaxed text-ink2">{a.intro}</p>
-        <div className="flex items-center justify-between rounded-2xl border border-line bg-card px-4 py-3 text-sm">
+        <div className="flex items-center justify-between rounded-xl border border-line bg-card px-4 py-3 text-sm">
           <span>
             推しの旅 <b className="num">{vids.length}</b>本 ・ スポット <b className="num">{places.length}</b>か所
           </span>
@@ -47,7 +47,7 @@ export default async function AreaPage({ params }: PageProps<"/areas/[id]">) {
       </div>
 
       <section className="mt-8 flex flex-col gap-3">
-        <h2 className="px-4 text-lg font-black">この街の推しの旅</h2>
+        <h2 className="px-4 text-lg font-bold">この街の推しの旅</h2>
         <div className="hscroll">
           {vids.map((v) => (
             <TripCard key={v.id} video={v} />
@@ -60,7 +60,7 @@ export default async function AreaPage({ params }: PageProps<"/areas/[id]">) {
         if (!list.length) return null;
         return (
           <section key={cat} className="mt-8 flex flex-col gap-2.5 px-4">
-            <h2 className="text-lg font-black">{CATEGORY_LABEL[cat]}</h2>
+            <h2 className="text-lg font-bold">{CATEGORY_LABEL[cat]}</h2>
             {list.map((p) => (
               <PlaceRow key={p.id} place={p} />
             ))}
@@ -70,11 +70,11 @@ export default async function AreaPage({ params }: PageProps<"/areas/[id]">) {
 
       {learn.length > 0 && (
         <section className="mt-8 flex flex-col gap-3">
-          <h2 className="px-4 text-lg font-black">行く前に知っておくと楽しいこと</h2>
+          <h2 className="px-4 text-lg font-bold">行く前に知っておくと楽しいこと</h2>
           <div className="hscroll">
             {learn.map((card, i) => (
-              <div key={card.title} className="w-64 rounded-2xl border border-line bg-card p-4">
-                <p className="text-[11px] font-bold text-sea">豆知識 {i + 1}</p>
+              <div key={card.title} className="w-64 rounded-xl border border-line bg-card p-4">
+                <p className="text-xs font-bold text-ink">豆知識 {i + 1}</p>
                 <p className="mt-1 leading-snug font-bold">{card.title}</p>
                 <p className="mt-2 text-sm leading-relaxed text-ink2">{card.body}</p>
               </div>
