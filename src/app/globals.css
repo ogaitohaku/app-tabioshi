@@ -2,19 +2,17 @@
 
 /* タビオシの色と文字。明るい表示だけ(ダークモードは使わない方針) */
 @theme {
-  --color-paper: #fafaf8;
+  /* OGA 統一ルール B(明るい業務サービス風):白地＋グレー＋ブランド色1色(朱) */
+  --color-paper: #ffffff;
   --color-card: #ffffff;
-  --color-ink: #16181d;
-  --color-ink2: #4a4f59;
-  --color-mute: #878c96;
-  --color-line: #e7e7e3;
+  --color-wash: #f6f7f9;
+  --color-ink: #1a1d21;
+  --color-ink2: #5b636e;
+  --color-mute: #6b7380;
+  --color-line: #e3e6ea;
   --color-shu: #e8502e;
   --color-shu-soft: #fdede7;
-  --color-sea: #1f5f7a;
-  --color-sea-soft: #e7f0f3;
-  --color-moss: #3e6b3a;
-  --color-moss-soft: #ecf2ea;
-  --font-sans: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", Meiryo, system-ui, sans-serif;
+  --font-sans: "Noto Sans JP", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, system-ui, sans-serif;
 }
 
 :root {

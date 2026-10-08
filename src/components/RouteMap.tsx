@@ -29,7 +29,7 @@ export function RouteMap({ stops }: { stops: Place[] }) {
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="overflow-hidden rounded-2xl border border-line bg-sea-soft">
+      <div className="overflow-hidden rounded-xl border border-line bg-wash">
         <svg viewBox={`0 0 ${W} ${H}`} className="block h-auto w-full" role="img" aria-label={`回る順番の地図(${stops.length}か所)`}>
           <defs>
             <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse">
@@ -41,7 +41,7 @@ export function RouteMap({ stops }: { stops: Place[] }) {
           {pts.map(([x, y], i) => (
             <g key={stops[i].id}>
               <circle cx={x} cy={y} r="12" fill={stops[i].category === "stay" ? "#16181d" : "#e8502e"} stroke="#ffffff" strokeWidth="2.5" />
-              <text x={x} y={y + 4} textAnchor="middle" fontSize="12" fontWeight="800" fill="#ffffff">
+              <text x={x} y={y + 4} textAnchor="middle" fontSize="12" fontWeight="700" fill="#ffffff">
                 {i + 1}
               </text>
             </g>
@@ -52,7 +52,12 @@ export function RouteMap({ stops }: { stops: Place[] }) {
         <p className="text-xs text-mute">
           全{stops.length}か所 ・ 直線でおよそ <span className="num font-bold text-ink2">{km < 10 ? km.toFixed(1) : Math.round(km)}km</span>
         </p>
-        <a href={gmaps} target="_blank" rel="noopener" className="inline-flex shrink-0 items-center gap-1 rounded-full border border-line bg-card px-3 py-1.5 text-xs font-bold">
+        <a
+          href={gmaps}
+          target="_blank"
+          rel="noopener"
+          className="inline-flex shrink-0 items-center gap-1 rounded-full border border-line bg-card px-3 py-1.5 text-xs font-bold"
+        >
           Googleマップで道順
           <Icon name="external" className="h-3 w-3" />
         </a>

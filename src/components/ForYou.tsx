@@ -13,19 +13,18 @@ export function ForYou({ trips, cards, themeLabel }: { trips: TripFacts[]; cards
 
   if (!prefs.done || editing) {
     const themes = Object.keys(themeLabel) as Theme[];
-    const toggle = (t: Theme) =>
-      setDraft((d) => ({ ...d, themes: d.themes.includes(t) ? d.themes.filter((x) => x !== t) : [...d.themes, t] }));
+    const toggle = (t: Theme) => setDraft((d) => ({ ...d, themes: d.themes.includes(t) ? d.themes.filter((x) => x !== t) : [...d.themes, t] }));
     const save = () => {
       setPrefs({ ...draft, done: true });
       setEditing(false);
       track("prefs_set", { themes: draft.themes.join(","), budget: draft.budget ?? "none" });
     };
     return (
-      <section className="mx-4 flex flex-col gap-4 rounded-2xl bg-ink p-4 text-white">
+      <section className="mx-4 flex flex-col gap-4 rounded-xl border border-line bg-wash p-4">
         <div>
-          <p className="text-[11px] font-bold tracking-widest text-shu">あなた向け</p>
-          <h2 className="text-lg font-black">好きな旅を教えてください</h2>
-          <p className="text-xs text-white/70">答えはこのスマホの中だけに保存します。</p>
+          <p className="text-xs font-bold tracking-widest text-shu">あなた向け</p>
+          <h2 className="text-lg font-bold">好きな旅を教えてください</h2>
+          <p className="text-xs text-ink2">答えはこのスマホの中だけに保存します。</p>
           <Link href="/type" className="mt-1 inline-block text-xs font-bold text-shu underline">
             旅タイプ診断で決める(20問・約2分)
           </Link>
@@ -41,7 +40,7 @@ export function ForYou({ trips, cards, themeLabel }: { trips: TripFacts[]; cards
                   type="button"
                   aria-pressed={on}
                   onClick={() => toggle(t)}
-                  className={`h-9 rounded-full px-3.5 text-sm font-bold ${on ? "bg-shu text-white" : "bg-white/10 text-white ring-1 ring-white/25"}`}
+                  className={`h-11 rounded-full px-3.5 text-sm font-bold ${on ? "bg-shu text-white" : "bg-card text-ink ring-1 ring-line"}`}
                 >
                   {themeLabel[t]}
                 </button>
@@ -60,7 +59,7 @@ export function ForYou({ trips, cards, themeLabel }: { trips: TripFacts[]; cards
                   type="button"
                   aria-pressed={on}
                   onClick={() => setDraft((d) => ({ ...d, budget: b }))}
-                  className={`h-10 rounded-xl text-sm font-bold ${on ? "bg-shu text-white" : "bg-white/10 text-white ring-1 ring-white/25"}`}
+                  className={`h-11 rounded-xl text-sm font-bold ${on ? "bg-shu text-white" : "bg-card text-ink ring-1 ring-line"}`}
                 >
                   {BUDGET_LABEL[b]}
                 </button>
@@ -72,7 +71,7 @@ export function ForYou({ trips, cards, themeLabel }: { trips: TripFacts[]; cards
           type="button"
           onClick={save}
           disabled={!draft.themes.length && !draft.budget}
-          className="h-12 rounded-full bg-white font-bold text-ink disabled:opacity-40"
+          className="h-12 rounded-full bg-shu font-bold text-white disabled:opacity-40"
         >
           あなた向けの旅を見る
         </button>
@@ -86,7 +85,7 @@ export function ForYou({ trips, cards, themeLabel }: { trips: TripFacts[]; cards
     <section className="flex flex-col gap-3">
       <div className="flex items-end justify-between gap-3 px-4">
         <div className="min-w-0">
-          <h2 className="text-lg font-black">あなた向けの旅</h2>
+          <h2 className="text-lg font-bold">あなた向けの旅</h2>
           <p className="truncate text-xs text-mute">{summary}</p>
         </div>
         <button
@@ -103,7 +102,7 @@ export function ForYou({ trips, cards, themeLabel }: { trips: TripFacts[]; cards
       <div className="hscroll">
         {ranked.map((t) => (
           <div key={t.id} className="flex flex-col gap-1.5">
-            <p className={`text-[11px] font-bold ${t.hit.length ? "text-shu" : "text-mute"}`}>
+            <p className={`text-xs font-bold ${t.hit.length ? "text-shu" : "text-mute"}`}>
               {t.hit.length ? `${t.hit.map((h) => themeLabel[h]).join("・")}が好きなあなたに` : t.fits ? "予算内で行ける旅" : "ちょっと贅沢な旅"}
             </p>
             {cards[t.id]}

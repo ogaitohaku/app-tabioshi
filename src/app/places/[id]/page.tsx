@@ -44,8 +44,8 @@ export default async function PlacePage({ params }: PageProps<"/places/[id]">) {
           }}
         />
       )}
+      <BackBar />
       <div className="relative aspect-[4/3] bg-line">
-        <BackBar overlay />
         <Visual visual={p.visual} alt={`${p.name}(イメージ)`} />
       </div>
 
@@ -56,7 +56,7 @@ export default async function PlacePage({ params }: PageProps<"/places/[id]">) {
           {p.sponsored && <PrBadge />}
         </p>
         <div className="flex items-start justify-between gap-3">
-          <h1 className="text-2xl font-black">{p.name}</h1>
+          <h1 className="text-2xl font-bold">{p.name}</h1>
           <ShareButton title={p.name} path={`/places/${p.id}`} kind="place" />
         </div>
         {s && (
@@ -67,7 +67,7 @@ export default async function PlacePage({ params }: PageProps<"/places/[id]">) {
         )}
 
         {c && v && (
-          <Link href={`/trips/${v.id}`} className="flex gap-3 rounded-2xl bg-shu-soft p-3">
+          <Link href={`/trips/${v.id}`} className="flex gap-3 rounded-xl bg-shu-soft p-3">
             <span className="h-10 w-10 shrink-0 overflow-hidden rounded-full">
               <Visual visual={c.visual} />
             </span>
@@ -83,18 +83,20 @@ export default async function PlacePage({ params }: PageProps<"/places/[id]">) {
       </div>
 
       {s ? (
-        <section className="mx-4 mt-6 flex flex-col gap-3 rounded-2xl border border-line bg-card p-4">
+        <section className="mx-4 mt-6 flex flex-col gap-3 rounded-xl border border-line bg-card p-4">
           <div className="flex items-baseline justify-between">
             <span className="text-sm font-bold">{s.meal}</span>
             <span>
-              <span className="num text-xl font-black">{yen(s.pricePerNight)}</span>
+              <span className="num text-xl font-bold">{yen(s.pricePerNight)}</span>
               <span className="text-xs text-mute"> 〜 / 1泊・2名</span>
             </span>
           </div>
-          <p className="text-xs text-mute">1人あたり {yen(s.pricePerNight / 2)}〜 ・ {s.access}</p>
+          <p className="text-xs text-mute">
+            1人あたり {yen(s.pricePerNight / 2)}〜 ・ {s.access}
+          </p>
           <div className="flex flex-wrap gap-1.5">
             {s.tags.map((t) => (
-              <span key={t} className="rounded-full bg-paper px-2.5 py-1 text-xs font-bold text-ink2">
+              <span key={t} className="rounded-full bg-wash px-2.5 py-1 text-xs font-bold text-ink2">
                 {t}
               </span>
             ))}
@@ -103,29 +105,29 @@ export default async function PlacePage({ params }: PageProps<"/places/[id]">) {
           <BookingDisclosure />
         </section>
       ) : (
-        <section className="mx-4 mt-6 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line text-sm">
+        <section className="mx-4 mt-6 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-line bg-line text-sm">
           {[
             ["料金の目安", p.priceLabel],
             ["状態", p.status],
           ].map(([k, val]) => (
             <div key={k} className="bg-card p-3">
-              <p className="text-[11px] text-mute">{k}</p>
+              <p className="text-xs text-mute">{k}</p>
               <p className="font-bold">{val}</p>
             </div>
           ))}
         </section>
       )}
 
-      <p className="mt-3 px-4 text-[11px] text-mute">情報の確認日:{p.checkedAt}</p>
+      <p className="mt-3 px-4 text-xs text-mute">情報の確認日:{p.checkedAt}</p>
 
       {s && (
         <section className="mt-8 flex flex-col gap-3 px-4">
-          <h2 className="text-lg font-black">口コミ</h2>
+          <h2 className="text-lg font-bold">口コミ</h2>
           {s.reviews.map((r) => (
-            <div key={r.by} className="rounded-2xl border border-line bg-card p-3 text-sm">
+            <div key={r.by} className="rounded-xl border border-line bg-card p-3 text-sm">
               <p className="flex flex-wrap items-center gap-2 font-bold">
                 {r.by}
-                {r.fromVideo && <span className="rounded bg-shu-soft px-1.5 text-[10px] text-shu">推しの動画を見て予約</span>}
+                {r.fromVideo && <span className="rounded bg-shu-soft px-1.5 text-xs text-shu">推しの動画を見て予約</span>}
                 <Stars score={r.score} />
               </p>
               <p className="mt-1 leading-relaxed text-ink2">{r.text}</p>

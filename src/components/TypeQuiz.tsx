@@ -19,9 +19,9 @@ const SCALE = [
   { v: 2, size: "h-9 w-9", tone: "border-shu", on: "bg-shu" },
   { v: 1, size: "h-7 w-7", tone: "border-shu", on: "bg-shu" },
   { v: 0, size: "h-6 w-6", tone: "border-mute", on: "bg-mute" },
-  { v: -1, size: "h-7 w-7", tone: "border-sea", on: "bg-sea" },
-  { v: -2, size: "h-9 w-9", tone: "border-sea", on: "bg-sea" },
-  { v: -3, size: "h-11 w-11", tone: "border-sea", on: "bg-sea" },
+  { v: -1, size: "h-7 w-7", tone: "border-ink2", on: "bg-ink2" },
+  { v: -2, size: "h-9 w-9", tone: "border-ink2", on: "bg-ink2" },
+  { v: -3, size: "h-11 w-11", tone: "border-ink2", on: "bg-ink2" },
 ];
 const SCALE_LABEL: Record<number, string> = {
   3: "とてもそう思う",
@@ -100,7 +100,7 @@ export function TypeQuiz({ questions, facts, children }: { questions: TypeQuesti
     return (
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-3">
-          <button type="button" onClick={start} className="rounded-full bg-shu py-3.5 text-base font-black text-white">
+          <button type="button" onClick={start} className="rounded-full bg-shu py-3.5 text-base font-bold text-white">
             {mine.code ? "もう一度診断する" : "診断をはじめる"}
           </button>
           {last && (
@@ -134,8 +134,8 @@ export function TypeQuiz({ questions, facts, children }: { questions: TypeQuesti
           {step + 1} / {queue.length}
         </p>
       </div>
-      {step >= core && <p className="rounded-xl bg-sea-soft px-3 py-2 text-xs font-bold text-sea">答えが半々だったところを、あと少しだけ確かめます。</p>}
-      <h2 data-q className="min-h-20 text-xl leading-snug font-black">
+      {step >= core && <p className="rounded-xl bg-wash px-3 py-2 text-xs font-bold text-ink">答えが半々だったところを、あと少しだけ確かめます。</p>}
+      <h2 data-q className="min-h-20 text-xl leading-snug font-bold">
         {q.text}
       </h2>
       <fieldset className="flex flex-col gap-2">
@@ -158,10 +158,10 @@ export function TypeQuiz({ questions, facts, children }: { questions: TypeQuesti
         <div className="flex justify-between text-xs font-bold">
           <span className="text-shu">そう思う</span>
           <span className="text-mute">どちらでもない</span>
-          <span className="text-sea">そう思わない</span>
+          <span className="text-ink">そう思わない</span>
         </div>
       </fieldset>
-      <p className="text-[11px] text-mute">「こうありたい」ではなく、実際の旅でよくすることで答えてください。</p>
+      <p className="text-xs text-mute">「こうありたい」ではなく、実際の旅でよくすることで答えてください。</p>
       {step > 0 && (
         <button type="button" onClick={() => setStep(step - 1)} className="self-start text-sm font-bold text-mute">
           ← 前の質問に戻る

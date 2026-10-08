@@ -306,13 +306,13 @@ export function Globe({ videos, places }: { videos: Video[]; places: Place[] }) 
               className="pointer-events-auto absolute top-0 left-0 -mt-14 -ml-6 flex flex-col items-center"
               aria-label={`${v.area}を拡大`}
             >
-              <span className="relative h-12 w-12 rounded-full border-[3px] border-white shadow-lg">
+              <span className="relative h-12 w-12 rounded-full border-[3px] border-white shadow">
                 <span className="block h-full w-full overflow-hidden rounded-full">
                   <Visual visual={v.visual} />
                 </span>
-                <span ref={setPin(`b:${v.id}`)} hidden className="absolute -top-1 -right-2 rounded-full bg-shu px-1.5 text-[10px] leading-4 font-bold text-white" />
+                <span ref={setPin(`b:${v.id}`)} hidden className="absolute -top-1 -right-2 rounded-full bg-shu px-1.5 text-xs leading-4 font-bold text-white" />
               </span>
-              <span className="mt-0.5 rounded-full bg-white px-1.5 text-[10px] font-bold shadow">{v.area.split("・")[1]}</span>
+              <span className="mt-0.5 rounded-full bg-white px-1.5 text-xs font-bold shadow">{v.area.split("・")[1]}</span>
             </button>
           ))}
           {places.map((p) => (
@@ -321,7 +321,7 @@ export function Globe({ videos, places }: { videos: Video[]; places: Place[] }) 
               ref={setPin(`p:${p.id}`)}
               hidden
               href={`/places/${p.id}`}
-              className="pointer-events-auto absolute top-0 left-0 -mt-8 -translate-x-1/2 rounded-full bg-white px-2 py-1 text-[11px] font-bold whitespace-nowrap shadow-md ring-1 ring-black/5"
+              className="pointer-events-auto absolute top-0 left-0 -mt-8 -translate-x-1/2 rounded-full bg-white px-2 py-1 text-xs font-bold whitespace-nowrap shadow ring-1 ring-black/5"
             >
               {p.sponsored && <span className="mr-1 text-mute">PR</span>}
               {p.name}
@@ -345,17 +345,17 @@ export function Globe({ videos, places }: { videos: Video[]; places: Place[] }) 
           </button>
         </div>
         {hint && (
-          <span className="pointer-events-none absolute bottom-8 left-1/2 -translate-x-1/2 rounded-full bg-black/60 px-3 py-1.5 text-xs text-white">
+          <span className="pointer-events-none absolute bottom-8 left-1/2 -translate-x-1/2 rounded-full bg-white px-3 py-1.5 text-xs text-ink ring-1 ring-line">
             指で回す・2本指で拡大
           </span>
         )}
-        <span className="absolute bottom-2 left-3 text-[10px] text-ink2/70">地図データ: Natural Earth</span>
+        <span className="absolute bottom-2 left-3 text-xs text-ink2/70">地図データ: Natural Earth</span>
       </div>
 
       <div className="hscroll px-0">
         {areaVideo
           ? areaPlaces.map((p) => (
-              <Link key={p.id} href={`/places/${p.id}`} className="flex w-60 gap-2 rounded-2xl border border-line bg-card p-2">
+              <Link key={p.id} href={`/places/${p.id}`} className="flex w-60 gap-2 rounded-xl border border-line bg-card p-2">
                 <span className="h-14 w-14 shrink-0 overflow-hidden rounded-xl">
                   <Visual visual={p.visual} />
                 </span>
@@ -366,7 +366,7 @@ export function Globe({ videos, places }: { videos: Video[]; places: Place[] }) 
               </Link>
             ))
           : videos.map((v) => (
-              <button key={v.id} type="button" onClick={() => api.current?.fitArea(v.id)} className="flex w-60 gap-2 rounded-2xl border border-line bg-card p-2 text-left">
+              <button key={v.id} type="button" onClick={() => api.current?.fitArea(v.id)} className="flex w-60 gap-2 rounded-xl border border-line bg-card p-2 text-left">
                 <span className="h-14 w-14 shrink-0 overflow-hidden rounded-xl">
                   <Visual visual={v.visual} />
                 </span>

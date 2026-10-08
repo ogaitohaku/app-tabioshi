@@ -10,7 +10,7 @@ export function SavedTrips({ videos }: { videos: Video[] }) {
   const saved = ids.map((id) => videos.find((v) => v.id === id)).filter((v): v is Video => Boolean(v));
   if (!saved.length) {
     return (
-      <div className="flex flex-col items-center gap-3 rounded-3xl border border-dashed border-line bg-card px-6 py-10 text-center">
+      <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-line bg-card px-6 py-10 text-center">
         <Icon name="bookmark" className="h-8 w-8 text-mute" />
         <p className="font-bold">まだコピーした旅はありません</p>
         <p className="text-sm text-ink2">旅ショートで気になった旅を見つけたら、「この旅をまるごとコピー」を押してください。</p>
@@ -25,7 +25,7 @@ export function SavedTrips({ videos }: { videos: Video[] }) {
       {saved.map((v) => (
         <TripCard key={v.id} video={v} wide />
       ))}
-      <p className="text-[11px] text-mute">コピーした旅は、いまはこの端末の中だけに保存されます。</p>
+      <p className="text-xs text-mute">コピーした旅は、いまはこの端末の中だけに保存されます。</p>
     </div>
   );
 }

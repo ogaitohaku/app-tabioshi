@@ -14,13 +14,18 @@ const dayNumber = (d: Date) => Math.floor(Date.UTC(d.getFullYear(), d.getMonth()
 
 // 日付はスマホの時計で決める(サーバーで作るページには入れない)
 const noop = () => () => {};
-const useToday = () => useSyncExternalStore(noop, () => day(), () => null);
+const useToday = () =>
+  useSyncExternalStore(
+    noop,
+    () => day(),
+    () => null,
+  );
 
 /** 1日1問。毎日答えると「連続◯日」が伸びる */
 export function DailyQuiz({ quizzes, names }: { quizzes: Quiz[]; names: { [videoId: string]: string | undefined } }) {
   const [rec, setRec] = useRecord();
   const today = useToday();
-  if (!today) return <section className="mx-4 h-72 rounded-2xl border border-line bg-card" aria-hidden />;
+  if (!today) return <section className="mx-4 h-72 rounded-xl border border-line bg-card" aria-hidden />;
   const [y, m, d] = today.split("-").map(Number);
   const yesterday = day(new Date(y, m - 1, d - 1));
   const quiz = quizzes[dayNumber(new Date(y, m - 1, d)) % quizzes.length];
@@ -32,7 +37,7 @@ export function DailyQuiz({ quizzes, names }: { quizzes: Quiz[]; names: { [video
     <section className="flex flex-col gap-3 px-4">
       <div className="flex items-end justify-between">
         <div>
-          <h2 className="text-lg font-black">今日の1問</h2>
+          <h2 className="text-lg font-bold">今日の1問</h2>
           <p className="text-xs text-mute">毎日答えて、旅の予習を続けよう</p>
         </div>
         <p className="rounded-full bg-shu-soft px-3 py-1 text-xs font-bold text-shu">

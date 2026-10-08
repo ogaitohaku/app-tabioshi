@@ -32,17 +32,15 @@ export default async function Trip({ params }: PageProps<"/trips/[id]">) {
 
   return (
     <main className="pb-10">
-      <div className="relative">
-        <BackBar overlay />
-        <VideoPlayer video={v} />
-        {area && (
-          <Link href={`/areas/${area.id}`} className="absolute bottom-3 left-3 rounded-full bg-black/55 px-2.5 py-1 text-xs font-bold text-white">
-            {v.area}
-          </Link>
-        )}
-      </div>
+      <BackBar />
+      <VideoPlayer video={v} />
 
       <div className="flex flex-col gap-4 px-4 pt-4">
+        {area && (
+          <Link href={`/areas/${area.id}`} className="w-fit rounded-full bg-wash px-2.5 py-1 text-xs font-bold text-ink2 ring-1 ring-line">
+            {v.area}のエリアガイド
+          </Link>
+        )}
         <Link href={`/creators/${v.creatorId}`} className="flex items-center gap-2 text-sm font-bold">
           <span className="h-8 w-8 overflow-hidden rounded-full">{c && <Visual visual={c.visual} />}</span>
           {c?.name}
@@ -50,11 +48,11 @@ export default async function Trip({ params }: PageProps<"/trips/[id]">) {
             ・ {v.postedAt} ・ {v.views}再生
           </span>
         </Link>
-        <h1 className="text-xl leading-snug font-black">{v.title}</h1>
+        <h1 className="text-xl leading-snug font-bold">{v.title}</h1>
         <p className="text-sm leading-relaxed text-ink2">{v.caption}</p>
-        <div className="flex items-center justify-between rounded-2xl bg-shu-soft px-4 py-3">
+        <div className="flex items-center justify-between rounded-xl bg-shu-soft px-4 py-3">
           <span className="text-xs font-bold text-ink2">この旅の1人あたりの目安</span>
-          <span className="num text-lg font-black">{yen(tripCostPerPerson(v.id))}〜</span>
+          <span className="num text-lg font-bold">{yen(tripCostPerPerson(v.id))}〜</span>
         </div>
         <div className="flex gap-2">
           <div className="flex-1 [&>button]:w-full">
@@ -65,12 +63,12 @@ export default async function Trip({ params }: PageProps<"/trips/[id]">) {
       </div>
 
       <section className="mt-8 flex flex-col gap-3 px-4">
-        <h2 className="text-lg font-black">旅程(動画に出てくる順)</h2>
+        <h2 className="text-lg font-bold">旅程(動画に出てくる順)</h2>
         <RouteMap stops={stops} />
         <ol className="flex flex-col gap-2.5">
           {stops.map((p, i) => (
             <li key={p.id} className="flex flex-col gap-1">
-              <span className="num text-[11px] font-bold text-mute">動画の {timecode(p.at)} ごろ</span>
+              <span className="num text-xs font-bold text-mute">動画の {timecode(p.at)} ごろ</span>
               <PlaceRow place={p} index={i} />
             </li>
           ))}
@@ -78,7 +76,7 @@ export default async function Trip({ params }: PageProps<"/trips/[id]">) {
       </section>
 
       {stay?.stay && (
-        <section className="mx-4 mt-8 flex flex-col gap-3 rounded-2xl border border-line bg-card p-4">
+        <section className="mx-4 mt-8 flex flex-col gap-3 rounded-xl border border-line bg-card p-4">
           <p className="text-sm font-bold">推しが泊まった宿:{stay.name}</p>
           <BookingButton stay={stay.stay} placeId={stay.id} />
           <BookingDisclosure />
@@ -87,11 +85,11 @@ export default async function Trip({ params }: PageProps<"/trips/[id]">) {
 
       {learn && (
         <section className="mt-8 flex flex-col gap-3">
-          <h2 className="px-4 text-lg font-black">{learn.title}</h2>
+          <h2 className="px-4 text-lg font-bold">{learn.title}</h2>
           <div className="hscroll">
             {learn.cards.map((card, i) => (
-              <div key={card.title} className="w-64 rounded-2xl border border-line bg-card p-4">
-                <p className="text-[11px] font-bold text-sea">豆知識 {i + 1}</p>
+              <div key={card.title} className="w-64 rounded-xl border border-line bg-card p-4">
+                <p className="text-xs font-bold text-ink">豆知識 {i + 1}</p>
                 <p className="mt-1 leading-snug font-bold">{card.title}</p>
                 <p className="mt-2 text-sm leading-relaxed text-ink2">{card.body}</p>
               </div>

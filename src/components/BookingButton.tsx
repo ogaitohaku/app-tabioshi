@@ -31,7 +31,7 @@ export function BookingButton({ stay, placeId, compact = false }: { stay: StayDe
 
 export function BookingDisclosure() {
   return (
-    <p className="text-[11px] leading-relaxed text-mute">
+    <p className="text-xs leading-relaxed text-mute">
       予約は楽天トラベルなど外部の予約サイトで行います。予約が成立すると、タビオシと旅を紹介したクリエイターが紹介料を受け取ります。料金はどこから予約しても同じです。
     </p>
   );
