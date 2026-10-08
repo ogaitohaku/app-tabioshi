@@ -3,13 +3,27 @@ import { useState } from "react";
 import type { Quiz } from "@/data/types";
 import { Icon } from "./Icon";
 
-export function QuizCard({ quiz, creatorName }: { quiz: Quiz; creatorName?: string }) {
-  const [picked, setPicked] = useState<number | null>(null);
+export function QuizCard({
+  quiz,
+  creatorName,
+  label = "旅の予習クイズ",
+  answered = null,
+  onAnswer,
+}: {
+  quiz: Quiz;
+  creatorName?: string;
+  label?: string;
+  /** すでに答えた選択肢(毎日クイズで、今日の答えを覚えておくとき) */
+  answered?: number | null;
+  onAnswer?: (picked: number, correct: boolean) => void;
+}) {
+  const [own, setPicked] = useState<number | null>(null);
+  const picked = own ?? answered;
   const done = picked !== null;
   const right = picked === quiz.answer;
   return (
     <div className="flex flex-col gap-2.5 rounded-2xl border border-line bg-card p-4">
-      <p className="text-[11px] font-bold text-shu">旅の予習クイズ</p>
+      <p className="text-[11px] font-bold text-shu">{label}</p>
       <p className="font-bold leading-snug">{quiz.question}</p>
       <div className="flex flex-col gap-2">
         {quiz.options.map((o, i) => {
@@ -20,7 +34,10 @@ export function QuizCard({ quiz, creatorName }: { quiz: Quiz; creatorName?: stri
               key={o}
               type="button"
               disabled={done}
-              onClick={() => setPicked(i)}
+              onClick={() => {
+                setPicked(i);
+                onAnswer?.(i, i === quiz.answer);
+              }}
               className={`flex items-center gap-2 rounded-xl border px-3 py-2.5 text-left text-sm ${
                 isAns ? "border-moss bg-moss-soft font-bold" : isWrong ? "border-shu bg-shu-soft" : "border-line"
               }`}

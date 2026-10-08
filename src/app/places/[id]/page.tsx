@@ -5,15 +5,17 @@ import { BackBar } from "@/components/BackBar";
 import { BookingButton, BookingDisclosure } from "@/components/BookingButton";
 import { CATEGORY_ICON, PrBadge, SampleNote, Stars } from "@/components/bits";
 import { Icon } from "@/components/Icon";
+import { ShareButton } from "@/components/ShareButton";
 import { Visual } from "@/components/Visual";
-import { allPlaces, CATEGORY_LABEL, getCreator, getPlace, getVideo } from "@/lib/content";
+import { allPlaces, CATEGORY_LABEL, getCreator, getPlace, getVideo, IS_SAMPLE } from "@/lib/content";
+import { SITE_URL } from "@/lib/site";
 import { timecode, yen } from "@/lib/format";
 
 export const generateStaticParams = () => allPlaces().map((p) => ({ id: p.id }));
 
 export async function generateMetadata({ params }: PageProps<"/places/[id]">): Promise<Metadata> {
   const p = getPlace((await params).id);
-  return { title: p?.name };
+  return { title: p?.name, description: p ? `${p.address}。「${p.creatorWord}」` : undefined };
 }
 
 export default async function PlacePage({ params }: PageProps<"/places/[id]">) {
@@ -25,6 +27,23 @@ export default async function PlacePage({ params }: PageProps<"/places/[id]">) {
 
   return (
     <main className="pb-10">
+      {s && !IS_SAMPLE && (
+        <script
+          type="application/ld+json"
+          // 検索エンジン向けの宿の情報(サンプルデータの間は出さない)
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "LodgingBusiness",
+              name: p.name,
+              address: p.address,
+              url: `${SITE_URL}/places/${p.id}`,
+              geo: { "@type": "GeoCoordinates", longitude: p.lngLat[0], latitude: p.lngLat[1] },
+              aggregateRating: { "@type": "AggregateRating", ratingValue: s.score, reviewCount: s.reviewCount },
+            }).replace(/</g, "\\u003c"),
+          }}
+        />
+      )}
       <div className="relative aspect-[4/3] bg-line">
         <BackBar overlay />
         <Visual visual={p.visual} alt={`${p.name}(イメージ)`} />
@@ -36,7 +55,10 @@ export default async function PlacePage({ params }: PageProps<"/places/[id]">) {
           {s ? s.kind : CATEGORY_LABEL[p.category]} ・ {p.address}
           {p.sponsored && <PrBadge />}
         </p>
-        <h1 className="text-2xl font-black">{p.name}</h1>
+        <div className="flex items-start justify-between gap-3">
+          <h1 className="text-2xl font-black">{p.name}</h1>
+          <ShareButton title={p.name} path={`/places/${p.id}`} kind="place" />
+        </div>
         {s && (
           <p className="flex items-center gap-2 text-sm">
             <Stars score={s.score} />
@@ -77,7 +99,7 @@ export default async function PlacePage({ params }: PageProps<"/places/[id]">) {
               </span>
             ))}
           </div>
-          <BookingButton stay={s} />
+          <BookingButton stay={s} placeId={p.id} />
           <BookingDisclosure />
         </section>
       ) : (

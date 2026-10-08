@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { BackBar } from "@/components/BackBar";
 import { SampleNote, TripCard } from "@/components/bits";
 import { Icon } from "@/components/Icon";
+import { ShareButton } from "@/components/ShareButton";
 import { Visual } from "@/components/Visual";
 import { allCreators, getCreator, placesInVideo, videosByCreator } from "@/lib/content";
 
@@ -10,7 +11,7 @@ export const generateStaticParams = () => allCreators().map((c) => ({ id: c.id }
 
 export async function generateMetadata({ params }: PageProps<"/creators/[id]">): Promise<Metadata> {
   const c = getCreator((await params).id);
-  return { title: c?.name };
+  return { title: c?.name, description: c?.bio };
 }
 
 const PLATFORM_LABEL = { tiktok: "TikTok", instagram: "Instagram", youtube: "YouTube" } as const;
@@ -31,6 +32,7 @@ export default async function CreatorPage({ params }: PageProps<"/creators/[id]"
         <h1 className="text-2xl font-black">{c.name}</h1>
         <p className="text-sm text-mute">{c.genre}</p>
         <p className="max-w-xs text-sm leading-relaxed text-ink2">{c.bio}</p>
+        <ShareButton title={`${c.name}の旅`} path={`/creators/${c.id}`} kind="creator" />
         <dl className="grid w-full grid-cols-3 rounded-2xl border border-line bg-card py-3">
           {[
             ["旅", `${vids.length}本`],

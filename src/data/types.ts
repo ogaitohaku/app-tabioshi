@@ -33,9 +33,22 @@ export type Creator = {
 
 export type Platform = "tiktok" | "instagram" | "youtube";
 
+/** 旅の好み。診断と絞り込みで使う */
+export type Theme = "onsen" | "sea" | "snow" | "town" | "food" | "train" | "craft";
+
+export type Area = {
+  id: string;
+  name: string; // 表示用(例: 大分・別府)
+  pref: string;
+  intro: string;
+  visual: Visual;
+};
+
 export type Video = {
   id: string;
   creatorId: string;
+  areaId: string;
+  themes: Theme[];
   title: string;
   caption: string;
   area: string; // 表示用(例: 大分・別府)

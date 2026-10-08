@@ -1,6 +1,6 @@
 // 画面からはこのファイル経由でデータを読む。データの置き場所(今はファイル、のちにデータベース)を変えても画面は変えずに済む。
-import { creators, learn, places, quizzes, videos } from "@/data/sample";
-import type { PlaceCategory } from "@/data/types";
+import { areas, creators, learn, places, quizzes, videos } from "@/data/sample";
+import type { PlaceCategory, Theme } from "@/data/types";
 
 export { IS_SAMPLE } from "@/data/sample";
 
@@ -10,6 +10,25 @@ export const CATEGORY_LABEL: Record<PlaceCategory, string> = {
   gift: "お土産",
   spot: "絶景",
 };
+
+export const THEME_LABEL: Record<Theme, string> = {
+  onsen: "温泉",
+  sea: "海・島",
+  snow: "雪景色",
+  town: "街歩き",
+  food: "グルメ",
+  train: "鉄道",
+  craft: "ものづくり",
+};
+
+export const allAreas = () => areas;
+export const getArea = (id: string) => areas.find((a) => a.id === id);
+export const videosInArea = (areaId: string) => videos.filter((v) => v.areaId === areaId);
+export const placesInArea = (areaId: string) => {
+  const ids = new Set(videosInArea(areaId).map((v) => v.id));
+  return places.filter((p) => ids.has(p.videoId));
+};
+export const allQuizzes = () => quizzes;
 
 export const allCreators = () => creators;
 export const allVideos = () => videos;
