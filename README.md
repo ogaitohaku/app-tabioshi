@@ -16,6 +16,7 @@
 | エリア `/areas/[id]` | その街の推しの旅と、宿・ごはん・お土産・スポット |
 | 推し `/creators/[id]` | プロフィールと旅の一覧 |
 | 旅マップ `/map` | 指で回して拡大できる地球儀。推しが行った場所のピン |
+| 行き先をいっしょに決める `/pick` | 旅や場所を2〜6つ選んでリンクを作り、同行者に送る。相手は登録なしで「行きたい」を押して送り返す。名前と票はリンクの # の後ろだけに入り、サーバーには届かない |
 | マイ旅 `/me` | コピーした旅と「行きたい」の場所。エリアごと／旅先では近い順、「行った」の数(いまはこの端末にだけ保存) |
 | 旅タイプ診断 `/type` | 20問の旅タイプ診断(試作)、16タイプの結果、友だちとの相性 |
 
@@ -28,13 +29,15 @@ npm install
 npm run dev      # http://localhost:3000
 npm run build    # 本番用にビルド
 npm run lint
-npm run test:unit   # 予約先の表示の単体テスト
+npm run test:unit      # 予約先の表示・相談リンク・掲載前チェックの単体テスト
+npm run check:content  # 掲載前チェック(同意・元の投稿・確認日・予約先)。本物のデータでは要対応が残ると失敗
 ```
 
 画面を通しで確かめるときは、`npm run build && npx next start -p 3100` のあと、Playwright が入った環境で次を動かします。
 
 ```bash
 BASE=http://localhost:3100 node tests/e2e/flow.cjs        # 今回の流れ(動画→場所→保存→旅先で再発見)
+BASE=http://localhost:3100 node tests/e2e/pick.cjs        # 行き先をいっしょに決める(3人で送り合う)
 BASE=http://localhost:3100 node tests/e2e/regression.cjs  # これまでの画面と操作
 ```
 
@@ -46,6 +49,7 @@ BASE=http://localhost:3100 node tests/e2e/regression.cjs  # これまでの画�
 | --- | --- |
 | `tabioshi.savedTrips` | まるごとコピーした旅のID(文字列の配列) |
 | `tabioshi.myPlaces` | 「行きたい」と「行った」の場所ID → 日時 |
+| `tabioshi.plans` | 行き先の相談(候補と、送り返された票を合わせたもの。新しい順に20件)と、自分の呼び名 |
 | `tabioshi.prefs` | あなた向けの好み |
 | `tabioshi.dailyQuiz` | 今日の1問の記録 |
 | `tabioshi.type` | 旅タイプ診断の結果 |
@@ -61,6 +65,7 @@ BASE=http://localhost:3100 node tests/e2e/regression.cjs  # これまでの画�
   - 画面には、実際につながっている予約先(紹介リンク/通常のリンク/準備中)がそのまま出ます
 - 掲載料をもらっている宿・お店は `sponsored: true` にすると、画面に必ず「PR」と出ます。
 - 本物のデータに切り替えたら、`src/data/sample.ts` の `IS_SAMPLE` を `false` にすると「サンプルです」の注記が消えます。
+- 投稿者には `consent: { agreedAt, scope }`(掲載の同意をいつ・何についてもらったか)を書きます。公開前に `npm run check:content` で、同意・元の投稿のリンク・情報の確認日(180日以内)・予約先の抜けを確かめます。
 
 ## 予約のしくみ
 

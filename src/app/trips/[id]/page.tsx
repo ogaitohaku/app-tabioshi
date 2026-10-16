@@ -75,6 +75,12 @@ export default async function Trip({ params }: PageProps<"/trips/[id]">) {
           </Link>
           に保存されます(いまはこの端末の中だけ)。
         </p>
+        <Link
+          href={`/pick?add=t:${v.id}`}
+          className="inline-flex h-11 items-center justify-center gap-1.5 rounded-full bg-card px-4 text-sm font-bold text-ink ring-1 ring-line"
+        >
+          同行者と決める:この旅を候補にする
+        </Link>
       </div>
 
       <section className="mt-8 flex flex-col gap-3 px-4">

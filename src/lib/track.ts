@@ -14,7 +14,11 @@ export type TrackEvent =
   | "save_place"
   | "visited"
   | "near_sort"
-  | "share_open";
+  | "share_open"
+  | "plan_create"
+  | "plan_open"
+  | "plan_vote"
+  | "plan_send";
 
 export function track(event: TrackEvent, props: Record<string, string | number | boolean> = {}) {
   try {

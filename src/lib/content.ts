@@ -1,7 +1,7 @@
 // 画面からはこのファイル経由でデータを読む。データの置き場所(今はファイル、のちにデータベース)を変えても画面は変えずに済む。
 import { areas, creators, learn, places, quizzes, videos } from "@/data/sample";
 import { TYPES } from "@/data/travelType";
-import type { PlaceCategory, Theme } from "@/data/types";
+import type { PlaceCategory, Theme, Visual } from "@/data/types";
 import { bookingLink } from "@/lib/booking";
 
 export { IS_SAMPLE } from "@/data/sample";
@@ -79,4 +79,52 @@ export function bookingSummary() {
     none: links.filter((l) => !l).length,
     providers: [...new Set(links.flatMap((l) => (l ? [l.provider] : [])))],
   };
+}
+
+/** 「行き先をいっしょに決める」で候補にできるもの(旅と場所)。画面に出す分だけに絞って渡す */
+export type PlanCandidate = {
+  key: string; // "t:動画ID" | "p:場所ID"
+  kind: "trip" | "place";
+  href: string;
+  title: string;
+  area: string;
+  by: string; // 投稿者名
+  price: string; // 1人あたりの目安
+  note: string; // 立ち寄り数・種類
+  sponsored: boolean;
+  visual: Visual;
+  videoId: string;
+};
+
+export function planCandidates(): PlanCandidate[] {
+  const trips = videos.map<PlanCandidate>((v) => ({
+    key: `t:${v.id}`,
+    kind: "trip",
+    href: `/trips/${v.id}`,
+    title: v.title,
+    area: v.area,
+    by: getCreator(v.creatorId)?.name ?? "",
+    price: `1人 ¥${tripCostPerPerson(v.id).toLocaleString("ja-JP")}〜`,
+    note: `立ち寄り${placesInVideo(v.id).length}か所`,
+    sponsored: false,
+    visual: v.visual,
+    videoId: v.id,
+  }));
+  const spots = places.map<PlanCandidate>((p) => {
+    const v = getVideo(p.videoId);
+    return {
+      key: `p:${p.id}`,
+      kind: "place",
+      href: `/places/${p.id}`,
+      title: p.name,
+      area: v?.area ?? "",
+      by: (v && getCreator(v.creatorId)?.name) ?? "",
+      price: p.stay ? `1泊 ¥${Math.round(p.stay.pricePerNight / 2).toLocaleString("ja-JP")}〜/人` : p.priceLabel,
+      note: CATEGORY_LABEL[p.category],
+      sponsored: !!p.sponsored,
+      visual: p.visual,
+      videoId: p.videoId,
+    };
+  });
+  return [...trips, ...spots];
 }

@@ -29,6 +29,8 @@ export type Creator = {
   bio: string;
   visual: Visual;
   links: { platform: Platform; url: string }[];
+  /** 掲載の同意。いつ、何に同意してもらったか(本番では全員に必要。npm run check:content で確かめる) */
+  consent?: { agreedAt: string; scope: string };
 };
 
 export type Platform = "tiktok" | "instagram" | "youtube";
