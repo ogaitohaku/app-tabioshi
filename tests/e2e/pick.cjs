@@ -4,6 +4,7 @@
 // 再読み込み・古いリンク・転送・選び直し・別の端末で数を誤らないこと、共有の失敗から戻れることを確かめる。
 // 実行: npx next start -p 3100 のあと  BASE=http://localhost:3100 node tests/e2e/pick.cjs
 const { chromium } = require("playwright");
+const LEGACY = require("../unit/fixtures/legacy-2026-10-16.json"); // 前の版(842d272)で作った実物のリンクと保存データ
 const B = process.env.BASE || "http://localhost:3100";
 const results = [];
 const ok = (name, pass, info = "") => results.push({ name, pass: !!pass, info });
@@ -277,7 +278,40 @@ const vote = async (page, name, items) => {
   const plans = await p.evaluate(() => JSON.parse(localStorage.getItem("tabioshi.plans")));
   ok("新しいキー tabioshi.plans に相談と呼び名", plans.me === "ゆう" && Object.keys(plans.plans).length === 1);
 
-  const errs = [yu, misaki, ken].flatMap((x) => x.errs);
+  // 12. 前の版(時刻のない回答)で保存した端末と、前の版で配ったリンク
+  const old = await person(browser, { "tabioshi.plans": JSON.stringify(LEGACY.store) });
+  const o = old.page;
+  await o.goto(B + "/pick", { waitUntil: "networkidle" });
+  let main = await o.locator("main").innerText();
+  ok("旧保存: これまでの相談に2件が出る(冬の連休は2人が回答)", /冬の連休\s*2人が回答 ・ 候補2つ/.test(main) && main.includes("次の旅、どこにする?"), main.slice(0, 200));
+  await o.goto(B + "/pick#p=" + LEGACY.links.fromKen, { waitUntil: "networkidle" });
+  ok("旧リンク: 開ける・保存していた2人分が残る", (await o.getByText("2人が回答").count()) === 1 && (await count(o, "t:otaru")) === "2" && (await count(o, "t:beppu")) === "1");
+  ok("旧リンク: 「時刻のない前の版の回答」として扱うと表示", (await o.locator("[data-legacy-note]").innerText()).includes("けん、みさき"));
+  ok("旧リンク: すでに入っている回答を「加わった」と言わない", !(await o.locator("[data-sync-note]").innerText()).includes("加わった"));
+  // 新しい版で回答 → 合流
+  await vote(o, "ゆう", ["t:otaru"]);
+  ok("旧データ + 新しい回答: 3人で合流", (await o.getByText(/3人が回答/).count()) === 1 && (await count(o, "t:otaru")) === "3" && (await count(o, "t:beppu")) === "1");
+  const reshared = await copyLink(o);
+  ok("再共有: 新しい形のリンクに3人分が入る", JSON.parse(Buffer.from(reshared.split("#p=")[1], "base64url").toString()).votes["けん"].t === 0);
+  await o.reload({ waitUntil: "networkidle" });
+  ok("再読み込み: 3人のまま", (await o.getByText(/3人が回答/).count()) === 1 && (await count(o, "t:otaru")) === "3");
+  await o.goto(B + "/pick#p=" + LEGACY.links.fromMisaki, { waitUntil: "networkidle" });
+  ok("旧リンクを後から開いても3人のまま・数も同じ", (await o.getByText(/3人が回答/).count()) === 1 && (await count(o, "t:otaru")) === "3");
+  await o.getByRole("button", { name: "ここに決める" }).click();
+  await o.locator("[data-plan-decided]").waitFor();
+  await o.goto(B + "/pick", { waitUntil: "networkidle" });
+  main = await o.locator("main").innerText();
+  ok("これまでの相談: 冬の連休は1件だけ(二重にならない)", (main.match(/冬の連休/g) || []).length === 1 && /冬の連休\s*3人が回答/.test(main), main.slice(0, 200));
+  const stored = await o.evaluate(() => JSON.parse(localStorage.getItem("tabioshi.plans")));
+  ok("保存は新しいキーの形に付け直され、前の版のキーは残らない", Object.keys(stored.plans).sort().join(",") === "k3v9q2m8x1:t:otaru,t:beppu,p7a1b2c3d4:t:tadami,p:otaru-canal", Object.keys(stored.plans).join(","));
+  ok("前の版の回答は消えずに残る(けん)", JSON.stringify(stored.plans["k3v9q2m8x1:t:otaru,t:beppu"].plan.votes["けん"]) === JSON.stringify({ p: ["t:otaru", "t:beppu"], t: 0 }));
+  // 保存のない端末で旧リンクを開く(受け取った人)
+  const fresh = await person(browser);
+  await fresh.page.goto(B + "/pick?ref=share#p=" + LEGACY.links.fromMisaki, { waitUntil: "networkidle" });
+  ok("保存のない端末でも旧リンクを開ける", (await fresh.page.getByText("ゆうさんからの相談").count()) === 1 && (await count(fresh.page, "t:otaru")) === "1");
+  await fresh.ctx.close();
+
+  const errs = [yu, misaki, ken, old].flatMap((x) => x.errs);
   ok("ページのエラーなし", !errs.length, errs.join(" / "));
   await p.goto(decidedLink, { waitUntil: "networkidle" });
   await p.screenshot({ path: (process.env.OUT || ".") + "/pick-plan.png", fullPage: true });

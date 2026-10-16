@@ -16,10 +16,9 @@ import {
   withVote,
 } from "../../src/lib/plan.ts";
 
-const known = (k: string) => ["t:beppu", "t:otaru", "t:tadami", "t:onomichi", "p:otaru-canal", "p:akari"].includes(k);
 const base: Plan = { v: 1, id: "abc123def0", title: "冬の旅", by: "ゆう", items: ["t:beppu", "t:otaru", "p:otaru-canal"], votes: {} };
 const T = 1_760_600_000; // 2025-10-16 ごろ(秒)
-const roundTrip = (p: Plan) => decodePlan(encodePlan(p), known)!;
+const roundTrip = (p: Plan) => decodePlan(encodePlan(p))!;
 const merge = (a: Plan | undefined, b: Plan) => mergePlans(a, b).plan;
 
 test("日本語の名前が入っても、リンクにして戻すと同じ中身", () => {
@@ -30,29 +29,30 @@ test("日本語の名前が入っても、リンクにして戻すと同じ中�
 });
 
 test("壊れたリンクは null(画面は読み込めない旨を出す)", () => {
-  assert.equal(decodePlan("%%%", known), null);
+  assert.equal(decodePlan("%%%"), null);
   const s = encodePlan(base);
-  assert.equal(decodePlan(s.slice(0, Math.floor(s.length / 2)), known), null, "途中で切れたリンク");
-  assert.equal(decodePlan(s.slice(0, -1) + "*", known), null, "使えない文字が混ざったリンク");
-  assert.equal(decodePlan(encodePlan({ ...base, v: 2 } as unknown as Plan), known), null);
-  assert.equal(decodePlan(encodePlan({ ...base, items: ["t:nai"] }), known), null, "知らない候補しかなければ null");
+  assert.equal(decodePlan(s.slice(0, Math.floor(s.length / 2))), null, "途中で切れたリンク");
+  assert.equal(decodePlan(s.slice(0, -1) + "*"), null, "使えない文字が混ざったリンク");
+  assert.equal(decodePlan(encodePlan({ ...base, v: 2 } as unknown as Plan)), null);
+  assert.equal(decodePlan(encodePlan({ ...base, items: ["x:bad", "<script>"] })), null, "候補の形をしたものが1つもなければ null");
 });
 
-test("知らない候補・重複・上限を超えた分・形の崩れた票は落とし、名前は12文字・題は30文字まで", () => {
+test("形の崩れた候補・重複・上限を超えた分・形の崩れた票は落とし、名前は12文字・題は30文字まで", () => {
   const raw = {
     ...base,
     title: "あ".repeat(40),
-    items: ["t:beppu", "t:beppu", "t:nai", "t:otaru", "t:tadami", "p:otaru-canal", "t:onomichi", "p:akari"],
+    items: ["t:beppu", "t:beppu", "x:bad", "t:otaru", "t:nai", "t:tadami", "p:otaru-canal", "t:onomichi", "p:akari"],
     votes: {
-      ["な".repeat(20)]: { p: ["t:beppu", "t:nai"], t: T },
+      ["な".repeat(20)]: { p: ["t:beppu", "t:zzz"], t: T },
       "": { p: ["t:beppu"], t: T },
       時刻なし: { p: ["t:beppu"] },
-      配列だけ: ["t:beppu"],
+      変な時刻: { p: ["t:beppu"], t: -5 },
     },
-    decided: { item: "t:nai", t: T },
+    decided: { item: "t:nashi", t: T },
   };
-  const p = decodePlan(encodePlan(raw as unknown as Plan), known)!;
-  assert.deepEqual(p.items, ["t:beppu", "t:otaru", "t:tadami", "p:otaru-canal", "t:onomichi", "p:akari"]);
+  const p = decodePlan(encodePlan(raw as unknown as Plan))!;
+  // 掲載が終わった候補(t:nai)は形が正しければ残す。表示するときに外す
+  assert.deepEqual(p.items, ["t:beppu", "t:otaru", "t:nai", "t:tadami", "p:otaru-canal", "t:onomichi"]);
   assert.equal(p.title.length, 30);
   assert.deepEqual(p.votes, { ["な".repeat(12)]: { p: ["t:beppu"], t: T } });
   assert.equal(p.decided, undefined, "候補にない決定は捨てる");

@@ -2,14 +2,15 @@
 // この端末に保存する小さな設定(好み・クイズの記録など)。保存できない環境では開いている間だけ覚える。
 import { useSyncExternalStore } from "react";
 
-export function createLocalStore<T>(key: string, initial: T) {
+/** normalize を渡すと、読み込んだ中身をいまの形に直してから使う(前の版で保存した形を捨てずに読むため) */
+export function createLocalStore<T>(key: string, initial: T, normalize?: (raw: unknown) => T) {
   const listeners = new Set<() => void>();
   let cache: T | undefined;
   const read = (): T => {
     if (cache !== undefined) return cache;
     try {
       const raw = localStorage.getItem(key);
-      cache = raw ? ({ ...initial, ...JSON.parse(raw) } as T) : initial;
+      cache = !raw ? initial : normalize ? normalize(JSON.parse(raw)) : ({ ...initial, ...JSON.parse(raw) } as T);
     } catch {
       cache = initial;
     }

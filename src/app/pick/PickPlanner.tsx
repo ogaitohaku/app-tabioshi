@@ -15,6 +15,7 @@ import {
   newPlanId,
   type Plan,
   PLAN_LIMITS,
+  legacyVoters,
   planKey,
   planParam,
   tally,
@@ -52,6 +53,10 @@ export function PickPlanner({ candidates }: { candidates: PlanCandidate[] }) {
 
 // 自分で作った・選び直した・決めた直後の相談には「このリンクで変わったこと」を出さない
 let ownParam = "";
+function openOwnPlan(plan: Plan) {
+  ownParam = encodePlan(plan);
+  location.hash = `p=${ownParam}`;
+}
 
 const byKey = (candidates: PlanCandidate[]) => new Map(candidates.map((c) => [c.key, c]));
 
@@ -97,8 +102,7 @@ function Builder({ candidates }: { candidates: PlanCandidate[] }) {
     };
     setStore({ ...withPlan(store, plan), me: cleanName(me) });
     track("plan_create", { items: chosen.length, saved: chosen.filter((k) => savedKeys.has(k)).length });
-    ownParam = encodePlan(plan);
-    location.hash = `p=${ownParam}`;
+    openOwnPlan(plan);
   }
 
   const past = Object.values(store.plans).sort((a, b) => b.at.localeCompare(a.at));
@@ -239,13 +243,12 @@ const sameSet = (a: string[], b: string[]) => a.length === b.length && a.every((
 function PlanView({ param, candidates }: { param: string; candidates: PlanCandidate[] }) {
   const [store, setStore] = usePlansStore();
   const map = byKey(candidates);
-  const incoming = decodePlan(param, (k) => map.has(k));
+  // リンクも端末の保存も、前の版の形を含めていまの形に直して読む(plan.ts の normalizePlan / migratePlansStore)
+  const parsed = decodePlan(param);
+  // 掲載中の候補が1つもない相談は開けない(掲載が終わった候補は消さずに残し、表示だけ外す)
+  const incoming = parsed && parsed.items.some((k) => map.has(k)) ? parsed : null;
   const key = incoming ? planKey(incoming) : "";
-  // 端末に残した相談も、リンクと同じ確かめ方で読み直す(古い形や壊れたものは使わない)
-  const fromStore = () => {
-    const p = key ? store.plans[key]?.plan : undefined;
-    return p ? (decodePlan(encodePlan(p), (k) => map.has(k)) ?? undefined) : undefined;
-  };
+  const fromStore = () => (key ? store.plans[key]?.plan : undefined);
   // 開いた時点で手元にあった版(このリンクで何が変わったかを伝えるため、開いたときの状態を覚えておく)
   const [before] = useState(fromStore);
   const stored = fromStore();
@@ -271,7 +274,7 @@ function PlanView({ param, candidates }: { param: string; candidates: PlanCandid
   if (!plan) {
     return (
       <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-line bg-card px-6 py-10 text-center" role="alert">
-        <p className="font-bold">この相談のリンクを読み込めませんでした</p>
+        <p className="font-bold">{parsed ? "この相談の候補は、いまは掲載されていません" : "この相談のリンクを読み込めませんでした"}</p>
         <p className="text-sm text-ink2">
           リンクが途中で切れているかもしれません。送ってくれた人にもう一度送ってもらうか、新しく相談を作ってください。この端末で前に開いた相談は「これまでの相談」から開けます。
         </p>
@@ -285,7 +288,9 @@ function PlanView({ param, candidates }: { param: string; candidates: PlanCandid
   const meName = cleanName(me);
   const myVote = meName ? plan.votes[meName] : undefined;
   const mine = draft ?? myVote?.p ?? [];
-  const rows = tally(plan);
+  const rows = tally(plan).filter((r) => map.has(r.item));
+  const hidden = plan.items.filter((k) => !map.has(k)).length;
+  const legacy = legacyVoters(plan);
   const voters = Object.keys(plan.votes);
   const top = rows[0] && rows[0].count > 0 && rows[0].count !== rows[1]?.count ? map.get(rows[0].item) : undefined;
   const decided = plan.decided?.item ? map.get(plan.decided.item) : undefined;
@@ -297,8 +302,7 @@ function PlanView({ param, candidates }: { param: string; candidates: PlanCandid
   function commit(next: Plan) {
     setStore({ ...withPlan(store, next), me: meName });
     setSent("");
-    ownParam = encodePlan(next);
-    location.hash = `p=${ownParam}`;
+    openOwnPlan(next);
   }
 
   function save() {
@@ -374,6 +378,13 @@ function PlanView({ param, candidates }: { param: string; candidates: PlanCandid
             )}
           </ul>
         )}
+        {legacy.length > 0 && (
+          <p data-legacy-note>
+            前の版で入った回答(いつ選んだかの記録がないもの)は、いちばん古い回答として数えています:{legacy.join("、")}
+            。本人が選び直すと、新しい回答に置き換わります。
+          </p>
+        )}
+        {hidden > 0 && <p>掲載が終わった候補が{hidden}つあるため、表示していません(相談の中には残しています)。</p>}
         {report && !report.added.length && !report.updated.length && !report.kept.length && !report.dropped.length && (
           <p role="status">このリンクは、この端末の集計にすでに入っています(数は変わりません)。</p>
         )}
