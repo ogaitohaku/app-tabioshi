@@ -19,6 +19,8 @@ export type Visual = {
   scene: SceneName;
   seed: number;
   view?: SceneName; // room / exterior の窓から見える景色
+  /** 写真を枠に合わせて切り取るときに残す位置(CSS の object-position。例: "50% 30%")。省略時は中央 */
+  focus?: string;
 };
 
 export type Creator = {
@@ -29,6 +31,8 @@ export type Creator = {
   bio: string;
   visual: Visual;
   links: { platform: Platform; url: string }[];
+  /** 掲載の同意。いつ、何に同意してもらったか(本番では全員に必要。npm run check:content で確かめる) */
+  consent?: { agreedAt: string; scope: string };
 };
 
 export type Platform = "tiktok" | "instagram" | "youtube";
@@ -105,6 +109,8 @@ export type Booking = {
   rakutenHotelNo?: string;
   url?: string;
   label?: string;
+  /** url が紹介料を受け取る紹介リンク(アフィリエイト)のときだけ true。画面の説明が変わる */
+  affiliate?: boolean;
 };
 
 export type LearnCard = { title: string; body: string };

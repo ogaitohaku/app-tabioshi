@@ -1,0 +1,53 @@
+{
+  "generatedWith": "git show 842d272:src/lib/plan.ts(PR #6 の前の版)",
+  "links": {
+    "fromMisaki": "eyJ2IjoxLCJpZCI6ImszdjlxMm04eDEiLCJ0aXRsZSI6IuWGrOOBrumAo-S8kSIsImJ5Ijoi44KG44GGIiwiaXRlbXMiOlsidDpvdGFydSIsInQ6YmVwcHUiXSwidm90ZXMiOnsi44G_44GV44GNIjpbInQ6b3RhcnUiXX19",
+    "fromKen": "eyJ2IjoxLCJpZCI6ImszdjlxMm04eDEiLCJ0aXRsZSI6IuWGrOOBrumAo-S8kSIsImJ5Ijoi44KG44GGIiwiaXRlbXMiOlsidDpvdGFydSIsInQ6YmVwcHUiXSwidm90ZXMiOnsi44GR44KTIjpbInQ6b3RhcnUiLCJ0OmJlcHB1Il19fQ",
+    "created": "eyJ2IjoxLCJpZCI6ImszdjlxMm04eDEiLCJ0aXRsZSI6IuWGrOOBrumAo-S8kSIsImJ5Ijoi44KG44GGIiwiaXRlbXMiOlsidDpvdGFydSIsInQ6YmVwcHUiXSwidm90ZXMiOnt9fQ"
+  },
+  "store": {
+    "me": "ゆう",
+    "plans": {
+      "k3v9q2m8x1": {
+        "plan": {
+          "v": 1,
+          "id": "k3v9q2m8x1",
+          "title": "冬の連休",
+          "by": "ゆう",
+          "items": [
+            "t:otaru",
+            "t:beppu"
+          ],
+          "votes": {
+            "けん": [
+              "t:otaru",
+              "t:beppu"
+            ],
+            "みさき": [
+              "t:otaru"
+            ]
+          }
+        },
+        "at": "2026-10-16T07:50:00.000Z"
+      },
+      "p7a1b2c3d4": {
+        "plan": {
+          "v": 1,
+          "id": "p7a1b2c3d4",
+          "title": "次の旅、どこにする?",
+          "by": "ゆう",
+          "items": [
+            "t:tadami",
+            "p:otaru-canal"
+          ],
+          "votes": {
+            "ゆう": [
+              "t:tadami"
+            ]
+          }
+        },
+        "at": "2026-10-16T07:55:00.000Z"
+      }
+    }
+  }
+}
