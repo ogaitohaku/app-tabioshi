@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ContinueTrip } from "@/components/ContinueTrip";
 import { DailyQuiz } from "@/components/DailyQuiz";
 import { FirstVisit } from "@/components/FirstVisit";
 import { ForYou } from "@/components/ForYou";
@@ -10,6 +11,7 @@ import { Visual } from "@/components/Visual";
 import {
   allAreas,
   allCreators,
+  allPlaces,
   allQuizzes,
   allTravelTypes,
   allVideos,
@@ -46,6 +48,17 @@ export default function Home() {
       </header>
 
       <FirstVisit sample={IS_SAMPLE} />
+
+      <ContinueTrip
+        placesByTrip={Object.fromEntries(
+          videos.map((v) => [
+            v.id,
+            allPlaces()
+              .filter((p) => p.videoId === v.id)
+              .map((p) => p.id),
+          ]),
+        )}
+      />
 
       <section aria-labelledby="how" className="mx-4 flex flex-col gap-2">
         <h2 id="how" className="sr-only">

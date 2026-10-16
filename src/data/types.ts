@@ -105,6 +105,8 @@ export type Booking = {
   rakutenHotelNo?: string;
   url?: string;
   label?: string;
+  /** url が紹介料を受け取る紹介リンク(アフィリエイト)のときだけ true。画面の説明が変わる */
+  affiliate?: boolean;
 };
 
 export type LearnCard = { title: string; body: string };

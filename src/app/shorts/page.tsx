@@ -5,6 +5,7 @@ import { CopyTripButton } from "@/components/CopyTripButton";
 import { Icon } from "@/components/Icon";
 import { Visual } from "@/components/Visual";
 import { allVideos, getCreator, IS_SAMPLE, stayOfVideo } from "@/lib/content";
+import { bookingLink } from "@/lib/booking";
 import { yen } from "@/lib/format";
 
 export const metadata: Metadata = { title: "旅ショート" };
@@ -63,6 +64,10 @@ export default function Shorts() {
             </div>
 
             <p className="line-clamp-2 text-sm leading-relaxed">{v.caption}</p>
+            <p className="-mt-1.5 truncate text-xs text-mute">
+              出典:{c?.name ?? "不明"}の投稿 ・ {v.postedAt}
+              {!v.source && "(元の投稿リンク未登録)"}
+            </p>
             {i === 0 && videos.length > 1 && <p className="-mt-1 text-xs text-mute">上にスワイプすると、次の旅に切り替わります。</p>}
             {stay?.stay && (
               <Link href={`/places/${stay.id}`} className="flex items-center gap-3 rounded-xl border border-line bg-card p-2">
@@ -78,7 +83,11 @@ export default function Shorts() {
                     {stay.stay.kind} ・ 1人 <span className="num">{yen(stay.stay.pricePerNight / 2)}</span>〜
                   </span>
                 </span>
-                <span className="shrink-0 rounded-full bg-shu px-3 py-2 text-xs font-bold text-white">空室を見る</span>
+                {bookingLink(stay.stay.booking) ? (
+                  <span className="shrink-0 rounded-full bg-shu px-3 py-2 text-xs font-bold text-white">空室を見る</span>
+                ) : (
+                  <span className="shrink-0 rounded-full bg-wash px-3 py-2 text-xs font-bold text-ink2 ring-1 ring-line">宿を見る</span>
+                )}
               </Link>
             )}
             <div className="[&>button]:w-full">

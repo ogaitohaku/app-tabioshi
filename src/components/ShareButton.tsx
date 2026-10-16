@@ -7,7 +7,12 @@ import { Icon } from "./Icon";
 export function ShareButton({ title, path, kind }: { title: string; path: string; kind: string }) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
-  const url = () => new URL(path, location.origin).toString();
+  // ?ref=share を付けて、共有リンクから来た人に一言添える(と、共有から何人来たかを数える)
+  const url = () => {
+    const u = new URL(path, location.origin);
+    u.searchParams.set("ref", "share");
+    return u.toString();
+  };
 
   async function onShare() {
     if (navigator.share) {

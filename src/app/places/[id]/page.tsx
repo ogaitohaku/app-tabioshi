@@ -5,9 +5,13 @@ import { BackBar } from "@/components/BackBar";
 import { BookingButton, BookingDisclosure } from "@/components/BookingButton";
 import { CATEGORY_ICON, PrBadge, SampleNote, Stars } from "@/components/bits";
 import { Icon } from "@/components/Icon";
+import { SavePlaceButton, VisitedButton } from "@/components/PlaceActions";
 import { ShareButton } from "@/components/ShareButton";
+import { SharedBanner } from "@/components/SharedBanner";
+import { SourceCredit } from "@/components/SourceCredit";
 import { Visual } from "@/components/Visual";
 import { allPlaces, CATEGORY_LABEL, getCreator, getPlace, getVideo, IS_SAMPLE } from "@/lib/content";
+import { googleMapsPlaceUrl } from "@/lib/geo";
 import { SITE_URL } from "@/lib/site";
 import { timecode, yen } from "@/lib/format";
 
@@ -45,6 +49,7 @@ export default async function PlacePage({ params }: PageProps<"/places/[id]">) {
         />
       )}
       <BackBar />
+      <SharedBanner kind="place" />
       <div className="relative aspect-[4/3] bg-line">
         <Visual visual={p.visual} alt={`${p.name}(イメージ)`} />
       </div>
@@ -80,6 +85,20 @@ export default async function PlacePage({ params }: PageProps<"/places/[id]">) {
             </span>
           </Link>
         )}
+        <div className="flex flex-wrap gap-2">
+          <SavePlaceButton placeId={p.id} />
+          <VisitedButton placeId={p.id} />
+          <a
+            href={googleMapsPlaceUrl(p.lngLat)}
+            target="_blank"
+            rel="noopener"
+            className="inline-flex h-11 items-center gap-1.5 rounded-full bg-card px-4 text-sm font-bold text-ink ring-1 ring-line"
+          >
+            <Icon name="map" className="h-4 w-4" />
+            地図で開く
+          </a>
+        </div>
+        {v && <SourceCredit video={v} creator={c} place={p} sample={IS_SAMPLE} />}
       </div>
 
       {s ? (
@@ -102,7 +121,7 @@ export default async function PlacePage({ params }: PageProps<"/places/[id]">) {
             ))}
           </div>
           <BookingButton stay={s} placeId={p.id} />
-          <BookingDisclosure />
+          <BookingDisclosure stay={s} />
         </section>
       ) : (
         <section className="mx-4 mt-6 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-line bg-line text-sm">
@@ -117,8 +136,6 @@ export default async function PlacePage({ params }: PageProps<"/places/[id]">) {
           ))}
         </section>
       )}
-
-      <p className="mt-3 px-4 text-xs text-mute">情報の確認日:{p.checkedAt}</p>
 
       {s && (
         <section className="mt-8 flex flex-col gap-3 px-4">

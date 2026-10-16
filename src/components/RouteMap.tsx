@@ -1,4 +1,5 @@
 import type { Place } from "@/data/types";
+import { distanceKm } from "@/lib/geo";
 import { Icon } from "./Icon";
 
 const W = 360;
@@ -64,10 +65,4 @@ export function RouteMap({ stops }: { stops: Place[] }) {
       </div>
     </div>
   );
-}
-
-function distanceKm([lng1, lat1]: [number, number], [lng2, lat2]: [number, number]) {
-  const r = Math.PI / 180;
-  const a = Math.sin(((lat2 - lat1) * r) / 2) ** 2 + Math.cos(lat1 * r) * Math.cos(lat2 * r) * Math.sin(((lng2 - lng1) * r) / 2) ** 2;
-  return 12742 * Math.asin(Math.sqrt(a));
 }

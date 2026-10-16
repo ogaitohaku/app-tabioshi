@@ -2,6 +2,7 @@
 import { areas, creators, learn, places, quizzes, videos } from "@/data/sample";
 import { TYPES } from "@/data/travelType";
 import type { PlaceCategory, Theme } from "@/data/types";
+import { bookingLink } from "@/lib/booking";
 
 export { IS_SAMPLE } from "@/data/sample";
 
@@ -42,8 +43,7 @@ export const getPlace = (id: string) => places.find((p) => p.id === id);
 export const videosByCreator = (creatorId: string) => videos.filter((v) => v.creatorId === creatorId);
 
 /** 動画に出てくる順に並べた立ち寄り先 = 旅程 */
-export const placesInVideo = (videoId: string) =>
-  places.filter((p) => p.videoId === videoId).sort((a, b) => a.at - b.at);
+export const placesInVideo = (videoId: string) => places.filter((p) => p.videoId === videoId).sort((a, b) => a.at - b.at);
 
 export const stayOfVideo = (videoId: string) => placesInVideo(videoId).find((p) => p.category === "stay");
 
@@ -68,3 +68,15 @@ export const tripsForThemes = (...wants: Theme[][]) =>
     .map((v) => ({ v, score: wants.reduce((n, w) => n + (v.themes.some((t) => w.includes(t)) ? 2 : 0) + v.themes.filter((t) => w.includes(t)).length, 0) }))
     .sort((a, b) => b.score - a.score)
     .map((x) => x.v);
+
+/** 宿の予約先が実際にどこへつながっているかの集計(画面に正確に出すため) */
+export function bookingSummary() {
+  const links = stays().map((p) => bookingLink(p.stay?.booking));
+  return {
+    total: links.length,
+    affiliate: links.filter((l) => l?.affiliate).length,
+    direct: links.filter((l) => l && !l.affiliate).length,
+    none: links.filter((l) => !l).length,
+    providers: [...new Set(links.flatMap((l) => (l ? [l.provider] : [])))],
+  };
+}
