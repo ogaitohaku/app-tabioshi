@@ -248,7 +248,7 @@ const vote = async (page, name, items) => {
   ok("別の端末: 作った人として「ほかの端末とは同期しません」と出す", (await yu2.page.locator("[data-sync-note]").innerText()).includes("ほかの端末とは同期しません"));
   await yu2.ctx.close();
 
-  // 9. これまでの相談・壊れたリンク・知らない候補
+  // 9. これまでの相談・壊れたリンク(知らない候補を落とすのは単体テストで確認)
   await p.goto(B + "/pick", { waitUntil: "networkidle" });
   ok("これまでの相談に残る(3人が回答)", /冬の連休\s*3人が回答 ・ 候補2つ/.test(await p.locator("main").innerText()));
   await m.goto(B + "/pick#p=" + first.split("#p=")[1].slice(0, 40), { waitUntil: "networkidle" });
