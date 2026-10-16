@@ -6,7 +6,21 @@ import { Icon } from "@/components/Icon";
 import { Visual } from "@/components/Visual";
 import type { PlanCandidate } from "@/lib/content";
 import { useMyPlaces } from "@/lib/my-places";
-import { cleanName, decodePlan, DEFAULT_PLAN_TITLE, encodePlan, mergePlans, newPlanId, type Plan, PLAN_LIMITS, planParam, tally, withVote } from "@/lib/plan";
+import {
+  cleanName,
+  decodePlan,
+  DEFAULT_PLAN_TITLE,
+  encodePlan,
+  mergePlans,
+  newPlanId,
+  type Plan,
+  PLAN_LIMITS,
+  planKey,
+  planParam,
+  tally,
+  withDecision,
+  withVote,
+} from "@/lib/plan";
 import { usePlansStore, withPlan } from "@/lib/plans-store";
 import { useSavedTrips } from "@/lib/saved";
 import { track } from "@/lib/track";
@@ -35,6 +49,9 @@ export function PickPlanner({ candidates }: { candidates: PlanCandidate[] }) {
   if (param) return <PlanView key={param} param={param} candidates={candidates} />;
   return <Builder candidates={candidates} />;
 }
+
+// 自分で作った・選び直した・決めた直後の相談には「このリンクで変わったこと」を出さない
+let ownParam = "";
 
 const byKey = (candidates: PlanCandidate[]) => new Map(candidates.map((c) => [c.key, c]));
 
@@ -80,7 +97,8 @@ function Builder({ candidates }: { candidates: PlanCandidate[] }) {
     };
     setStore({ ...withPlan(store, plan), me: cleanName(me) });
     track("plan_create", { items: chosen.length, saved: chosen.filter((k) => savedKeys.has(k)).length });
-    location.hash = `p=${encodePlan(plan)}`;
+    ownParam = encodePlan(plan);
+    location.hash = `p=${ownParam}`;
   }
 
   const past = Object.values(store.plans).sort((a, b) => b.at.localeCompare(a.at));
@@ -216,12 +234,23 @@ function Builder({ candidates }: { candidates: PlanCandidate[] }) {
 
 /* ───────── 相談を見る・選ぶ・送る ───────── */
 
+const sameSet = (a: string[], b: string[]) => a.length === b.length && a.every((x) => b.includes(x));
+
 function PlanView({ param, candidates }: { param: string; candidates: PlanCandidate[] }) {
   const [store, setStore] = usePlansStore();
   const map = byKey(candidates);
   const incoming = decodePlan(param, (k) => map.has(k));
-  const stored = incoming ? store.plans[incoming.id]?.plan : undefined;
-  const plan = incoming ? mergePlans(stored, incoming) : null;
+  const key = incoming ? planKey(incoming) : "";
+  // 端末に残した相談も、リンクと同じ確かめ方で読み直す(古い形や壊れたものは使わない)
+  const fromStore = () => {
+    const p = key ? store.plans[key]?.plan : undefined;
+    return p ? (decodePlan(encodePlan(p), (k) => map.has(k)) ?? undefined) : undefined;
+  };
+  // 開いた時点で手元にあった版(このリンクで何が変わったかを伝えるため、開いたときの状態を覚えておく)
+  const [before] = useState(fromStore);
+  const stored = fromStore();
+  const plan = incoming ? mergePlans(stored, incoming).plan : null;
+  const report = incoming && before && param !== ownParam ? mergePlans(before, incoming).report : null;
   const encoded = plan ? encodePlan(plan) : "";
   const [name, setName] = useState<string | null>(null);
   const me = name ?? store.me;
@@ -234,7 +263,7 @@ function PlanView({ param, candidates }: { param: string; candidates: PlanCandid
     if (!plan) return;
     if (!stored || encodePlan(stored) !== encoded) setStore(withPlan(store, plan));
     // 開いたことだけを数える(名前や候補は送らない)
-    track("plan_open", { items: plan.items.length, voters: Object.keys(plan.votes).length });
+    track("plan_open", { items: plan.items.length, voters: Object.keys(plan.votes).length, decided: !!plan.decided?.item });
     // 相談が変わったときだけ動かす
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [encoded]);
@@ -243,32 +272,48 @@ function PlanView({ param, candidates }: { param: string; candidates: PlanCandid
     return (
       <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-line bg-card px-6 py-10 text-center" role="alert">
         <p className="font-bold">この相談のリンクを読み込めませんでした</p>
-        <p className="text-sm text-ink2">リンクが途中で切れているかもしれません。送ってくれた人にもう一度送ってもらうか、新しく相談を作ってください。</p>
+        <p className="text-sm text-ink2">
+          リンクが途中で切れているかもしれません。送ってくれた人にもう一度送ってもらうか、新しく相談を作ってください。この端末で前に開いた相談は「これまでの相談」から開けます。
+        </p>
         <a href="/pick" className="inline-flex h-11 items-center rounded-full bg-shu px-5 text-sm font-bold text-white">
-          新しく相談を作る
+          これまでの相談・新しく作る
         </a>
       </div>
     );
   }
 
   const meName = cleanName(me);
-  const mine = draft ?? (meName ? (plan.votes[meName] ?? []) : []);
+  const myVote = meName ? plan.votes[meName] : undefined;
+  const mine = draft ?? myVote?.p ?? [];
   const rows = tally(plan);
   const voters = Object.keys(plan.votes);
   const top = rows[0] && rows[0].count > 0 && rows[0].count !== rows[1]?.count ? map.get(rows[0].item) : undefined;
+  const decided = plan.decided?.item ? map.get(plan.decided.item) : undefined;
   const isOwner = !!meName && meName === plan.by;
-  const answered = !!meName && meName in plan.votes;
   // 押したけれど、まだリンクに入れていない
-  const changed = !!meName && draft !== null && JSON.stringify([...draft].sort()) !== JSON.stringify([...(plan.votes[meName] ?? [])].sort());
-  const unsaved = changed || (!!meName && !answered);
+  const changed = !!meName && draft !== null && !sameSet(draft, myVote?.p ?? []);
+  const unsaved = changed || (!!meName && !myVote);
+
+  function commit(next: Plan) {
+    setStore({ ...withPlan(store, next), me: meName });
+    setSent("");
+    ownParam = encodePlan(next);
+    location.hash = `p=${ownParam}`;
+  }
 
   function save() {
     if (!meName || !plan) return;
     const next = withVote(plan, meName, mine);
-    setStore({ ...withPlan(store, next), me: meName });
+    if (next === plan) return; // 上限人数
     setDraft(null);
-    track("plan_vote", { picks: mine.length, voters: Object.keys(next.votes).length });
-    location.hash = `p=${encodePlan(next)}`;
+    track("plan_vote", { picks: mine.length, voters: Object.keys(next.votes).length, changed: !!myVote });
+    commit(next);
+  }
+
+  function decide(item: string | null) {
+    if (!plan) return;
+    track("plan_decide", { undo: item === null, votes: item ? (rows.find((r) => r.item === item)?.count ?? 0) : 0 });
+    commit(withDecision(plan, item));
   }
 
   async function copy() {
@@ -285,12 +330,14 @@ function PlanView({ param, candidates }: { param: string; candidates: PlanCandid
     try {
       await navigator.share({ title: plan!.title, text: `「${plan!.title}」行きたいところを選んでね|タビオシ`, url: planUrl(plan!) });
       track("plan_send", { via: "native" });
-    } catch {
-      // 閉じただけなら何もしない
+    } catch (e) {
+      // 閉じただけなら何もしない(送ったことにはしない)。それ以外の失敗はリンクを直接見せる
+      if ((e as Error).name !== "AbortError") setSent("failed");
     }
   }
 
   const sendLabel = isOwner || !plan.by ? "同行者に送る" : `${plan.by}さんに送り返す`;
+  const full = !myVote && voters.length >= PLAN_LIMITS.voters;
 
   return (
     <div className="flex flex-col gap-6">
@@ -302,15 +349,73 @@ function PlanView({ param, candidates }: { param: string; candidates: PlanCandid
         </p>
       </div>
 
-      {top && (
-        <div className="flex flex-col gap-2 rounded-xl bg-shu-soft p-4" data-plan-top={top.key}>
-          <p className="text-xs font-bold text-ink2">いまいちばん「行きたい」が多い候補</p>
-          <p className="font-bold">{top.title}</p>
-          <Link href={top.href} className="inline-flex h-11 w-fit items-center gap-1.5 rounded-full bg-shu px-4 text-sm font-bold text-white">
-            {top.kind === "trip" ? "旅程と宿を見る" : "場所を見る"}
+      <div className="flex flex-col gap-1.5 rounded-xl border border-line bg-card p-3 text-xs leading-relaxed text-ink2" data-sync-note>
+        <p className="font-bold text-ink">この数は、この端末の中だけの集計です</p>
+        {isOwner ? (
+          <p>
+            サーバーには保存せず、ほかの端末とは同期しません。送り返されたリンクをこの端末で開いた分だけ数えています。まだ開いていない人の回答は入っていません。別の端末やブラウザでは、そこで開いたリンクの分だけになります。
+          </p>
+        ) : (
+          <p>
+            このリンクに入っている回答だけを数えています。ほかの人の回答はまだ入っていないことがあります。全員分は、送り返したリンクを
+            {plan.by ? `${plan.by}さん` : "相談した人"}
+            が開いたときに、その人の端末でそろいます。
+          </p>
+        )}
+        {report && (report.added.length > 0 || report.updated.length > 0 || report.kept.length > 0 || report.dropped.length > 0) && (
+          <ul className="flex flex-col gap-0.5" role="status" aria-label="このリンクで変わったこと">
+            {report.added.length > 0 && <li>このリンクで加わった回答:{report.added.join("、")}</li>}
+            {report.updated.length > 0 && <li>選び直しを反映:{report.updated.join("、")}</li>}
+            {report.kept.length > 0 && <li>このリンクの回答は古いので、手元の新しい回答のままにしました:{report.kept.join("、")}</li>}
+            {report.dropped.length > 0 && (
+              <li>
+                {PLAN_LIMITS.voters}人を超えたので入れていません:{report.dropped.join("、")}
+              </li>
+            )}
+          </ul>
+        )}
+        {report && !report.added.length && !report.updated.length && !report.kept.length && !report.dropped.length && (
+          <p role="status">このリンクは、この端末の集計にすでに入っています(数は変わりません)。</p>
+        )}
+      </div>
+
+      {decided ? (
+        <div className="flex flex-col gap-2 rounded-xl bg-shu-soft p-4" data-plan-decided={decided.key}>
+          <p className="text-xs font-bold text-ink2">{plan.by ? `${plan.by}さんが決めた行き先` : "決まった行き先"}</p>
+          <p className="font-bold">{decided.title}</p>
+          <p className="text-xs text-ink2">まだ予約はされていません。宿の予約は、旅程のページから予約サイトで行います。</p>
+          <Link href={decided.href} className="inline-flex h-11 w-fit items-center gap-1.5 rounded-full bg-shu px-4 text-sm font-bold text-white">
+            {decided.kind === "trip" ? "旅程と宿を見る" : "場所を見る"}
             <Icon name="arrow" className="h-4 w-4" />
           </Link>
+          {isOwner && (
+            <button type="button" onClick={() => decide(null)} className="inline-flex h-11 w-fit items-center text-sm font-bold text-ink2 underline">
+              決定を取り消す
+            </button>
+          )}
         </div>
+      ) : (
+        top && (
+          <div className="flex flex-col gap-2 rounded-xl bg-wash p-4" data-plan-top={top.key}>
+            <p className="text-xs font-bold text-ink2">いま「行きたい」がいちばん多い候補(まだ決定ではありません)</p>
+            <p className="font-bold">{top.title}</p>
+            <div className="flex flex-wrap gap-2">
+              {isOwner && (
+                <button
+                  type="button"
+                  onClick={() => decide(top.key)}
+                  className="inline-flex h-11 items-center gap-1.5 rounded-full bg-shu px-4 text-sm font-bold text-white"
+                >
+                  <Icon name="check" className="h-4 w-4" />
+                  ここに決める
+                </button>
+              )}
+              <Link href={top.href} className="inline-flex h-11 items-center gap-1.5 rounded-full bg-card px-4 text-sm font-bold ring-1 ring-line">
+                {top.kind === "trip" ? "旅程と宿を見る" : "場所を見る"}
+              </Link>
+            </div>
+          </div>
+        )
       )}
 
       <section aria-labelledby="vote" className="flex flex-col gap-3">
@@ -331,6 +436,7 @@ function PlanView({ param, candidates }: { param: string; candidates: PlanCandid
             className="h-11 rounded-xl border border-line bg-card px-3 text-base font-normal"
           />
         </label>
+        {myVote && !changed && <p className="text-xs text-mute">「{meName}」の回答はリンクに入っています。選び直すと、新しい方が数えられます。</p>}
         <ol className="flex flex-col gap-2" aria-label="候補と集計">
           {rows.map(({ item, count, names }) => {
             const c = map.get(item)!;
@@ -357,7 +463,7 @@ function PlanView({ param, candidates }: { param: string; candidates: PlanCandid
                   <button
                     type="button"
                     aria-pressed={on}
-                    disabled={!meName}
+                    disabled={!meName || full}
                     onClick={() => setDraft(on ? mine.filter((k) => k !== item) : [...mine, item])}
                     className={`inline-flex h-11 items-center gap-1.5 rounded-full px-4 text-sm font-bold disabled:opacity-50 ${on ? "bg-shu text-white" : "bg-card text-ink ring-1 ring-line"}`}
                   >
@@ -371,10 +477,11 @@ function PlanView({ param, candidates }: { param: string; candidates: PlanCandid
           })}
         </ol>
         {!meName && <p className="text-xs text-mute">呼び名を入れると「行きたい」を押せます(本名でなくて大丈夫です)。</p>}
+        {full && <p className="text-xs text-shu">この相談は{PLAN_LIMITS.voters}人が回答済みのため、新しい呼び名では回答できません。</p>}
         <button
           type="button"
           onClick={save}
-          disabled={!meName || !unsaved}
+          disabled={!meName || !unsaved || full}
           className="inline-flex h-12 items-center justify-center rounded-full bg-shu px-5 font-bold text-white disabled:bg-line disabled:text-ink2"
         >
           {unsaved ? "選んだ内容をリンクに入れる" : "リンクに入っています"}
@@ -387,15 +494,17 @@ function PlanView({ param, candidates }: { param: string; candidates: PlanCandid
         </h2>
         <p className="text-xs leading-relaxed text-ink2">
           {isOwner
-            ? "受け取った人が選んで送り返したリンクを開くと、この端末で全員分を合わせて数えます。"
-            : "このリンクには、あなたの選んだ内容と、これまでの回答が入っています。"}
+            ? decided
+              ? "決まったことを同行者に知らせるには、このリンクを送ってください。"
+              : "受け取った人が選んで送り返したリンクをこの端末で開くと、合わせて数えます。"
+            : "このリンクには、あなたの選んだ内容と、これまでの回答が入っています。送り返すまで相手には届きません。"}
         </p>
         {changed && <p className="text-xs font-bold text-shu">先に「選んだ内容をリンクに入れる」を押してください。</p>}
         <div className="flex flex-wrap gap-2">
           <a
             href={`https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(planUrl(plan))}`}
             target="_blank"
-            rel="noopener"
+            rel="noopener noreferrer"
             onClick={() => track("plan_send", { via: "line" })}
             className="inline-flex h-11 items-center gap-2 rounded-full bg-card px-4 text-sm font-bold ring-1 ring-line"
           >
@@ -417,16 +526,27 @@ function PlanView({ param, candidates }: { param: string; candidates: PlanCandid
             </button>
           )}
         </div>
-        {sent === "failed" && <p className="text-xs text-shu">コピーできませんでした。アドレス欄のリンクをそのまま送ってください。</p>}
+        {sent === "failed" && (
+          <label className="flex flex-col gap-1 text-xs text-shu">
+            うまく送れませんでした。下のリンクを長押ししてコピーし、送ってください。
+            <input
+              readOnly
+              value={planUrl(plan)}
+              onFocus={(e) => e.currentTarget.select()}
+              className="h-11 rounded-xl border border-line bg-card px-3 text-sm text-ink"
+              data-plan-url
+            />
+          </label>
+        )}
         <p className="text-xs leading-relaxed text-mute">
-          呼び名と票はリンクの #
-          より後ろだけに入り、タビオシのサーバーには送りません。リンクを受け取った人はだれでも中身を見られます。同じ呼び名は同じ人として数えます(最大
-          {PLAN_LIMITS.voters}人)。
+          呼び名と票はリンクの # より後ろだけに入り、タビオシのサーバーには送りません。ただし、リンクを送ったアプリ(LINE
+          など)と、リンクを受け取った人には中身が届きます。同じ呼び名は同じ人として数えます(最大
+          {PLAN_LIMITS.voters}人)。「送る」を押しても、相手が開いたかどうかはわかりません。
         </p>
       </section>
 
       <a href="/pick" className="inline-flex h-11 w-fit items-center text-sm font-bold text-shu underline">
-        別の相談を作る
+        これまでの相談・別の相談を作る
       </a>
     </div>
   );

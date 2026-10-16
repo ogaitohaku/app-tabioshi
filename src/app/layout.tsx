@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Analytics } from "@vercel/analytics/next";
+import { SafeAnalytics } from "@/components/SafeAnalytics";
 import { BottomNav } from "@/components/BottomNav";
 import { IS_SAMPLE } from "@/lib/content";
 import { SITE_NAME, SITE_URL, TAGLINE } from "@/lib/site";
@@ -35,7 +35,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           {children}
         </div>
         <BottomNav />
-        <Analytics />
+        <SafeAnalytics />
       </body>
     </html>
   );

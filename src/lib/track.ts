@@ -18,7 +18,8 @@ export type TrackEvent =
   | "plan_create"
   | "plan_open"
   | "plan_vote"
-  | "plan_send";
+  | "plan_send"
+  | "plan_decide";
 
 export function track(event: TrackEvent, props: Record<string, string | number | boolean> = {}) {
   try {

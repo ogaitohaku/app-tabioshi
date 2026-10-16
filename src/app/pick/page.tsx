@@ -7,6 +7,8 @@ import { PickPlanner } from "./PickPlanner";
 export const metadata: Metadata = {
   title: "行き先をいっしょに決める",
   description: "推しの旅の候補を同行者に送って、行きたいところを選んでもらえます。登録はいりません。",
+  // このページから外へ出るとき、どこから来たかを送らない(# の後ろはもともと送られない)
+  referrer: "same-origin",
 };
 
 export default function Pick() {
