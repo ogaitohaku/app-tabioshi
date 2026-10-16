@@ -6,7 +6,7 @@ import { OutLink } from "./OutLink";
 /** 予約は外部サイトで行う。予約先が未登録の宿はボタンを押せない状態で出す。どこにつながっているかを必ず一行で添える */
 export function BookingButton({ stay, placeId, compact = false }: { stay: StayDetail; placeId: string; compact?: boolean }) {
   const link = bookingLink(stay.booking);
-  const size = compact ? "h-11 px-4 text-sm" : "h-12 w-full text-base";
+  const size = compact ? "" : "min-h-12 w-full text-base";
   return (
     <span className={`flex flex-col gap-1 ${compact ? "items-start" : ""}`}>
       {link ? (
@@ -16,13 +16,13 @@ export function BookingButton({ stay, placeId, compact = false }: { stay: StayDe
           href={link.href}
           target="_blank"
           rel={link.affiliate ? "noopener sponsored" : "noopener"}
-          className={`inline-flex items-center justify-center gap-1.5 rounded-full bg-shu font-bold text-white ${size}`}
+          className={`btn btn-main ${size}`}
         >
           {link.label}
           <Icon name="external" className="h-4 w-4" />
         </OutLink>
       ) : (
-        <span aria-disabled="true" className={`inline-flex items-center justify-center rounded-full bg-line font-bold text-mute ${size}`}>
+        <span aria-disabled="true" className={`btn ${size}`}>
           予約先を準備中
         </span>
       )}

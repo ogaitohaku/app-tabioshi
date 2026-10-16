@@ -31,7 +31,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="ja" className="antialiased">
       <body className="min-h-dvh">
-        <div className="mx-auto min-h-dvh max-w-[480px] bg-paper pb-[calc(64px+env(safe-area-inset-bottom,0px))] shadow-[0_0_0_1px_var(--color-line)]">
+        <div className="mx-auto min-h-dvh max-w-[480px] bg-paper pb-[calc(3.5rem+1px+1rem+env(safe-area-inset-bottom,0px))] shadow-[0_0_0_1px_var(--color-line)]">
           {children}
         </div>
         <BottomNav />

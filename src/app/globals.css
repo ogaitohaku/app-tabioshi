@@ -29,12 +29,25 @@ body {
   font-family: var(--font-sans);
   font-feature-settings: "palt" 1;
   -webkit-tap-highlight-color: transparent;
+  /* 日本語を文節で折り返す(「行きた/い」のような切れ方を防ぐ。対応していないブラウザは今までどおり) */
+  word-break: auto-phrase;
+  overflow-wrap: anywhere;
 }
 
+/* PC では、アプリの列(幅480px)の外側をグレーにして、どこまでが画面かをはっきりさせる */
+@media (min-width: 520px) {
+  html,
+  body {
+    background: var(--color-wash);
+  }
+}
+
+/* 見出しは日本語の文節で折り返す(「夜/景」のような途中の折返しを防ぐ) */
 h1,
 h2,
 h3 {
   text-wrap: balance;
+  word-break: auto-phrase;
 }
 
 :focus-visible {
@@ -46,8 +59,54 @@ h3 {
   font-variant-numeric: tabular-nums;
 }
 
-/* 横にスワイプするカード列 */
+/*
+ * 見た目の規則(少数に絞る。新しい画面もこの中から選ぶ)
+ * - 文字: 24(ページ題) / 18(区切り) / 16(本文・名前) / 14(ボタン・補足) / 12(注記・出典)。太さは 400 と 700 だけ
+ * - 行間: 説明文は leading-relaxed(1.625)、名前や題は leading-snug
+ * - 余白: 4 の倍数。画面の左右 16px、区切りの間 24px、カードの中 12px
+ * - 角丸: 写真とカード 12px(rounded-xl)、小さい写真 8px(rounded-lg)、ボタンは丸(rounded-full)
+ * - 影は付けない。区切りは線(line)か、灰色の面(wash)のどちらか
+ * - 朱(shu)は、主な操作のボタン・リンク・選んだ状態にだけ使う。1つの画面で朱の塗りボタンは1つまで
+ * - ボタンは高さ 44px 以上。押した状態は「朱のうすい面＋朱の線＋チェック」で揃える
+ * - 写真の比率: 大きい写真 4:3、一覧の小さい写真 1:1。写真は画面の端まで広げず、左右 16px 内に置く
+ */
 @layer components {
+.btn {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 9999px;
+  padding-inline: 16px;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 700;
+  text-align: center;
+}
+.btn-main {
+  background: var(--color-shu);
+  color: #fff;
+}
+.btn-sub {
+  background: var(--color-card);
+  color: var(--color-ink);
+  box-shadow: inset 0 0 0 1px var(--color-line);
+}
+.btn-on {
+  background: var(--color-shu-soft);
+  color: var(--color-shu);
+  box-shadow: inset 0 0 0 1px var(--color-shu);
+}
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  background: var(--color-wash);
+  color: var(--color-ink2);
+  box-shadow: inset 0 0 0 1px var(--color-line);
+  cursor: not-allowed;
+}
+
+/* 横にスワイプするカード列 */
 .hscroll {
   display: flex;
   gap: 12px;

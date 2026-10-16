@@ -3,7 +3,10 @@ import { useEffect, useRef } from "react";
 import type { Visual as VisualData } from "@/data/types";
 import { drawScene } from "@/lib/scenes";
 
-/** 写真があれば写真、なければイメージ画像を、親の大きさいっぱいに表示する */
+/**
+ * 写真があれば写真、なければイメージ画像を、親の大きさいっぱいに表示する。
+ * 比率は親の枠で決める(大きい写真 4:3、一覧の小さい写真 1:1)。写真は focus の位置を残して切り取る
+ */
 export function Visual({ visual, alt = "", className = "" }: { visual: VisualData; alt?: string; className?: string }) {
   const ref = useRef<HTMLCanvasElement>(null);
 
@@ -33,8 +36,17 @@ export function Visual({ visual, alt = "", className = "" }: { visual: VisualDat
   }, [visual.photo, visual.scene, visual.seed, visual.view]);
 
   if (visual.photo) {
-    // eslint-disable-next-line @next/next/no-img-element
-    return <img src={visual.photo} alt={alt} className={`h-full w-full object-cover ${className}`} />;
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={visual.photo}
+        alt={alt}
+        style={visual.focus ? { objectPosition: visual.focus } : undefined}
+        className={`h-full w-full object-cover ${className}`}
+        loading="lazy"
+        decoding="async"
+      />
+    );
   }
   return <canvas ref={ref} role="img" aria-label={alt || undefined} className={`block h-full w-full ${className}`} />;
 }

@@ -4,7 +4,8 @@ import { track } from "@/lib/track";
 import { Icon } from "./Icon";
 
 /** スマホは端末の共有メニュー、使えないときは LINE とリンクコピーを出す */
-export function ShareButton({ title, path, kind }: { title: string; path: string; kind: string }) {
+/** iconOnly: 題の横など、幅がせまい所ではアイコンだけ(読み上げは「共有」) */
+export function ShareButton({ title, path, kind, iconOnly = false }: { title: string; path: string; kind: string; iconOnly?: boolean }) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   // ?ref=share を付けて、共有リンクから来た人に一言添える(と、共有から何人来たかを数える)
@@ -44,10 +45,12 @@ export function ShareButton({ title, path, kind }: { title: string; path: string
         type="button"
         onClick={onShare}
         aria-expanded={open}
-        className="inline-flex h-11 items-center gap-1.5 rounded-full bg-card px-4 text-sm font-bold text-ink ring-1 ring-line"
+        aria-label={iconOnly ? "共有" : undefined}
+        title={iconOnly ? "共有" : undefined}
+        className={`btn btn-sub ${iconOnly ? "w-11 px-0" : ""}`}
       >
-        <Icon name="share" className="h-4 w-4" />
-        共有
+        <Icon name="share" className={iconOnly ? "h-5 w-5" : "h-4 w-4"} />
+        {!iconOnly && "共有"}
       </button>
       {open && (
         <div className="absolute right-0 z-20 mt-2 flex w-56 flex-col gap-1 rounded-xl border border-line bg-card p-2 text-sm text-ink shadow-sm">

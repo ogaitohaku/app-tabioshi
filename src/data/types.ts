@@ -19,6 +19,8 @@ export type Visual = {
   scene: SceneName;
   seed: number;
   view?: SceneName; // room / exterior の窓から見える景色
+  /** 写真を枠に合わせて切り取るときに残す位置(CSS の object-position。例: "50% 30%")。省略時は中央 */
+  focus?: string;
 };
 
 export type Creator = {

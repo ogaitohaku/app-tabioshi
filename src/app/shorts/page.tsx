@@ -14,7 +14,7 @@ export const metadata: Metadata = { title: "旅ショート" };
 export default function Shorts() {
   const videos = allVideos();
   return (
-    <main className="fixed inset-x-0 top-0 bottom-[calc(57px+env(safe-area-inset-bottom,0px))] mx-auto max-w-[480px] snap-y snap-mandatory overflow-y-auto bg-paper">
+    <main className="fixed inset-x-0 top-0 bottom-[calc(3.5rem+1px+env(safe-area-inset-bottom,0px))] mx-auto max-w-[480px] snap-y snap-mandatory overflow-y-auto bg-paper">
       <h1 className="sr-only">旅ショート</h1>
       {videos.map((v, i) => {
         const c = getCreator(v.creatorId);
@@ -26,7 +26,7 @@ export default function Shorts() {
             aria-label={v.title}
           >
             <div className="flex items-center justify-between gap-3">
-              <Link href={`/creators/${v.creatorId}`} className="flex min-w-0 items-center gap-2">
+              <Link href={`/creators/${v.creatorId}`} className="flex min-h-11 min-w-0 items-center gap-2">
                 <span className="h-9 w-9 shrink-0 overflow-hidden rounded-full ring-1 ring-line">{c && <Visual visual={c.visual} />}</span>
                 <span className="truncate text-sm font-bold">{c?.name}</span>
               </Link>

@@ -220,7 +220,7 @@ function Builder({ candidates }: { candidates: PlanCandidate[] }) {
           type="button"
           onClick={create}
           disabled={!ready}
-          className="inline-flex h-12 items-center justify-center gap-1.5 rounded-full bg-shu px-5 font-bold text-white disabled:bg-mute"
+          className="btn btn-main min-h-12 w-full text-base"
         >
           候補のリンクを作る
         </button>
@@ -278,7 +278,7 @@ function PlanView({ param, candidates }: { param: string; candidates: PlanCandid
         <p className="text-sm text-ink2">
           リンクが途中で切れているかもしれません。送ってくれた人にもう一度送ってもらうか、新しく相談を作ってください。この端末で前に開いた相談は「これまでの相談」から開けます。
         </p>
-        <a href="/pick" className="inline-flex h-11 items-center rounded-full bg-shu px-5 text-sm font-bold text-white">
+        <a href="/pick" className="btn btn-main">
           これまでの相談・新しく作る
         </a>
       </div>
@@ -343,85 +343,111 @@ function PlanView({ param, candidates }: { param: string; candidates: PlanCandid
   const sendLabel = isOwner || !plan.by ? "同行者に送る" : `${plan.by}さんに送り返す`;
   const full = !myVote && voters.length >= PLAN_LIMITS.voters;
 
+  const maxCount = Math.max(1, voters.length);
+  const topRow = rows[0];
+
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-1">
-        <p className="text-xs font-bold text-mute">{isOwner ? "あなたが作った相談" : plan.by ? `${plan.by}さんからの相談` : "届いた相談"}</p>
-        <h1 className="text-2xl font-bold">{plan.title}</h1>
-        <p className="num text-sm text-ink2">
-          候補{plan.items.length}つ ・ {voters.length ? `${voters.length}人が回答(${voters.join("、")})` : "まだだれも回答していません"}
-        </p>
-      </div>
-
-      <div className="flex flex-col gap-1.5 rounded-xl border border-line bg-card p-3 text-xs leading-relaxed text-ink2" data-sync-note>
-        <p className="font-bold text-ink">この数は、この端末の中だけの集計です</p>
-        {isOwner ? (
-          <p>
-            サーバーには保存せず、ほかの端末とは同期しません。送り返されたリンクをこの端末で開いた分だけ数えています。まだ開いていない人の回答は入っていません。別の端末やブラウザでは、そこで開いたリンクの分だけになります。
+      {/* 1. どの相談か(題・回答した人)と、この数がどこまでの集計か。説明は短い1文にし、くわしくは開いて読む */}
+      <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-1">
+          <p className="text-xs font-bold text-ink2">{isOwner ? "あなたが作った相談" : plan.by ? `${plan.by}さんからの相談` : "届いた相談"}</p>
+          <h1 className="text-2xl leading-snug font-bold">{plan.title}</h1>
+          <p className="num text-sm text-ink2">
+            候補{plan.items.length}つ ・ {voters.length ? `${voters.length}人が回答(${voters.join("、")})` : "まだだれも回答していません"}
           </p>
-        ) : (
-          <p>
-            このリンクに入っている回答だけを数えています。ほかの人の回答はまだ入っていないことがあります。全員分は、送り返したリンクを
-            {plan.by ? `${plan.by}さん` : "相談した人"}
-            が開いたときに、その人の端末でそろいます。
-          </p>
-        )}
-        {report && (report.added.length > 0 || report.updated.length > 0 || report.kept.length > 0 || report.dropped.length > 0) && (
-          <ul className="flex flex-col gap-0.5" role="status" aria-label="このリンクで変わったこと">
-            {report.added.length > 0 && <li>このリンクで加わった回答:{report.added.join("、")}</li>}
-            {report.updated.length > 0 && <li>選び直しを反映:{report.updated.join("、")}</li>}
-            {report.kept.length > 0 && <li>このリンクの回答は古いので、手元の新しい回答のままにしました:{report.kept.join("、")}</li>}
-            {report.dropped.length > 0 && (
-              <li>
-                {PLAN_LIMITS.voters}人を超えたので入れていません:{report.dropped.join("、")}
-              </li>
-            )}
-          </ul>
-        )}
-        {legacy.length > 0 && (
-          <p data-legacy-note>
-            前の版で入った回答(いつ選んだかの記録がないもの)は、いちばん古い回答として数えています:{legacy.join("、")}
-            。本人が選び直すと、新しい回答に置き換わります。
-          </p>
-        )}
-        {hidden > 0 && <p>掲載が終わった候補が{hidden}つあるため、表示していません(相談の中には残しています)。</p>}
-        {report && !report.added.length && !report.updated.length && !report.kept.length && !report.dropped.length && (
-          <p role="status">このリンクは、この端末の集計にすでに入っています(数は変わりません)。</p>
-        )}
-      </div>
-
-      {decided ? (
-        <div className="flex flex-col gap-2 rounded-xl bg-shu-soft p-4" data-plan-decided={decided.key}>
-          <p className="text-xs font-bold text-ink2">{plan.by ? `${plan.by}さんが決めた行き先` : "決まった行き先"}</p>
-          <p className="font-bold">{decided.title}</p>
-          <p className="text-xs text-ink2">まだ予約はされていません。宿の予約は、旅程のページから予約サイトで行います。</p>
-          <Link href={decided.href} className="inline-flex h-11 w-fit items-center gap-1.5 rounded-full bg-shu px-4 text-sm font-bold text-white">
-            {decided.kind === "trip" ? "旅程と宿を見る" : "場所を見る"}
-            <Icon name="arrow" className="h-4 w-4" />
-          </Link>
-          {isOwner && (
-            <button type="button" onClick={() => decide(null)} className="inline-flex h-11 w-fit items-center text-sm font-bold text-ink2 underline">
-              決定を取り消す
-            </button>
+        </div>
+        <div className="flex flex-col gap-1 border-l-2 border-line pl-3 text-xs leading-relaxed text-ink2" data-sync-note>
+          {isOwner ? (
+            <p>
+              <span className="font-bold text-ink">この端末の中だけの集計です。</span>ほかの端末とは同期しません。
+            </p>
+          ) : (
+            <p>
+              <span className="font-bold text-ink">このリンクに入っている回答だけを数えています。</span>全員分は、送り返したリンクを
+              {plan.by ? `${plan.by}さん` : "相談した人"}
+              が開いたときに、その人の端末でそろいます。
+            </p>
           )}
+          {report && (report.added.length > 0 || report.updated.length > 0 || report.kept.length > 0 || report.dropped.length > 0) && (
+            <ul className="flex flex-col gap-0.5 font-bold text-ink" role="status" aria-label="このリンクで変わったこと">
+              {report.added.length > 0 && <li>このリンクで加わった回答:{report.added.join("、")}</li>}
+              {report.updated.length > 0 && <li>選び直しを反映:{report.updated.join("、")}</li>}
+              {report.kept.length > 0 && <li>このリンクの回答は古いので、手元の新しい回答のままにしました:{report.kept.join("、")}</li>}
+              {report.dropped.length > 0 && (
+                <li>
+                  {PLAN_LIMITS.voters}人を超えたので入れていません:{report.dropped.join("、")}
+                </li>
+              )}
+            </ul>
+          )}
+          {legacy.length > 0 && (
+            <p data-legacy-note>
+              前の版で入った回答(いつ選んだかの記録がないもの)は、いちばん古い回答として数えています:{legacy.join("、")}
+              。本人が選び直すと、新しい回答に置き換わります。
+            </p>
+          )}
+          {hidden > 0 && <p>掲載が終わった候補が{hidden}つあるため、表示していません(相談の中には残しています)。</p>}
+          {report && !report.added.length && !report.updated.length && !report.kept.length && !report.dropped.length && (
+            <p role="status">このリンクは、この端末の集計にすでに入っています(数は変わりません)。</p>
+          )}
+          <details className="group">
+            <summary className="inline-flex min-h-11 cursor-pointer items-center font-bold text-ink2 underline">集計のしくみ</summary>
+            <p>
+              {isOwner
+                ? "サーバーには保存しません。送り返されたリンクをこの端末で開いた分だけ数えています。まだ開いていない人の回答は入っていません。別の端末やブラウザでは、そこで開いたリンクの分だけになります。"
+                : "ほかの人の回答は、まだ入っていないことがあります。サーバーには保存しません。"}
+            </p>
+          </details>
+        </div>
+      </div>
+
+      {/* 2. 決まった行き先、またはいま多い候補(この画面の主役) */}
+      {decided ? (
+        <div className="flex flex-col gap-2 rounded-xl border border-shu bg-shu-soft p-4" data-plan-decided={decided.key}>
+          <p className="text-xs font-bold text-ink2">{plan.by ? `${plan.by}さんが決めた行き先` : "決まった行き先"}</p>
+          <div className="flex gap-3">
+            <span className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-line">
+              <Visual visual={decided.visual} />
+            </span>
+            <p className="min-w-0 leading-snug font-bold">{decided.title}</p>
+          </div>
+          <p className="text-xs text-ink2">まだ予約はされていません。宿の予約は、旅程のページから予約サイトで行います。</p>
+          <div className="flex flex-wrap items-center gap-2">
+            <Link href={decided.href} className="btn btn-main">
+              {decided.kind === "trip" ? "旅程と宿を見る" : "場所を見る"}
+              <Icon name="arrow" className="h-4 w-4" />
+            </Link>
+            {isOwner && (
+              <button type="button" onClick={() => decide(null)} className="btn text-ink2 underline">
+                決定を取り消す
+              </button>
+            )}
+          </div>
         </div>
       ) : (
         top && (
-          <div className="flex flex-col gap-2 rounded-xl bg-wash p-4" data-plan-top={top.key}>
+          <div className="flex flex-col gap-2 rounded-xl border border-line bg-card p-4" data-plan-top={top.key}>
             <p className="text-xs font-bold text-ink2">いま「行きたい」がいちばん多い候補(まだ決定ではありません)</p>
-            <p className="font-bold">{top.title}</p>
+            <div className="flex gap-3">
+              <span className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-line">
+                <Visual visual={top.visual} />
+              </span>
+              <span className="min-w-0">
+                <span className="block leading-snug font-bold">{top.title}</span>
+                <span className="num mt-0.5 block text-sm text-ink2">
+                  {topRow.count}人 / {voters.length}人が行きたい
+                </span>
+              </span>
+            </div>
             <div className="flex flex-wrap gap-2">
               {isOwner && (
-                <button
-                  type="button"
-                  onClick={() => decide(top.key)}
-                  className="inline-flex h-11 items-center gap-1.5 rounded-full bg-shu px-4 text-sm font-bold text-white"
-                >
+                <button type="button" onClick={() => decide(top.key)} className="btn btn-main">
                   <Icon name="check" className="h-4 w-4" />
                   ここに決める
                 </button>
               )}
-              <Link href={top.href} className="inline-flex h-11 items-center gap-1.5 rounded-full bg-card px-4 text-sm font-bold ring-1 ring-line">
+              <Link href={top.href} className="btn btn-sub">
                 {top.kind === "trip" ? "旅程と宿を見る" : "場所を見る"}
               </Link>
             </div>
@@ -429,6 +455,7 @@ function PlanView({ param, candidates }: { param: string; candidates: PlanCandid
         )
       )}
 
+      {/* 3. 候補を並べて比べる。数は棒の長さと数字で、だれが選んだかは小さく */}
       <section aria-labelledby="vote" className="flex flex-col gap-3">
         <h2 id="vote" className="text-lg font-bold">
           行きたいところを選ぶ(いくつでも)
@@ -444,59 +471,78 @@ function PlanView({ param, candidates }: { param: string; candidates: PlanCandid
             maxLength={PLAN_LIMITS.name}
             placeholder="例:ゆう"
             autoComplete="nickname"
+            aria-describedby={!meName ? "pick-name-hint" : undefined}
             className="h-11 rounded-xl border border-line bg-card px-3 text-base font-normal"
           />
         </label>
-        {myVote && !changed && <p className="text-xs text-mute">「{meName}」の回答はリンクに入っています。選び直すと、新しい方が数えられます。</p>}
+        {!meName && (
+          <p id="pick-name-hint" className="-mt-1 text-xs text-ink2">
+            呼び名を入れると「行きたい」を押せます(本名でなくて大丈夫です)。
+          </p>
+        )}
+        {myVote && !changed && <p className="-mt-1 text-xs text-ink2">「{meName}」の回答はリンクに入っています。選び直すと、新しい方が数えられます。</p>}
         <ol className="flex flex-col gap-2" aria-label="候補と集計">
           {rows.map(({ item, count, names }) => {
             const c = map.get(item)!;
             const on = mine.includes(item);
             return (
-              <li key={item} className="flex flex-col gap-2 rounded-xl border border-line bg-card p-2.5" data-plan-item={item} data-count={count}>
+              <li
+                key={item}
+                className={`flex flex-col gap-2.5 rounded-xl border bg-card p-3 ${on ? "border-shu" : "border-line"}`}
+                data-plan-item={item}
+                data-count={count}
+              >
                 <Link href={c.href} className="flex gap-3">
                   <span className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-line">
                     <Visual visual={c.visual} />
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="flex items-center gap-1.5 text-xs font-bold text-mute">
+                    <span className="flex flex-wrap items-center gap-1.5 text-xs font-bold text-ink2">
                       {c.kind === "trip" ? "旅" : c.note} ・ {c.area}
                       {c.sponsored && <PrBadge />}
                     </span>
                     <span className="block text-sm leading-snug font-bold">{c.title}</span>
-                    <span className="block text-xs text-mute">
-                      {c.by}の動画 ・ {c.price}
+                    <span className="mt-0.5 block text-xs text-mute">
+                      {c.by}の動画 ・ <span className="num">{c.price}</span>
                       {c.kind === "trip" && ` ・ ${c.note}`}
                     </span>
                   </span>
                 </Link>
+                <span className="flex items-center gap-2" aria-hidden="true">
+                  <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-wash">
+                    <span className="block h-full rounded-full bg-ink2" style={{ width: `${(count / maxCount) * 100}%` }} />
+                  </span>
+                  <span className="num w-10 text-right text-sm font-bold">{count}人</span>
+                </span>
                 <span className="flex items-center gap-2">
                   <button
                     type="button"
                     aria-pressed={on}
                     disabled={!meName || full}
                     onClick={() => setDraft(on ? mine.filter((k) => k !== item) : [...mine, item])}
-                    className={`inline-flex h-11 items-center gap-1.5 rounded-full px-4 text-sm font-bold disabled:opacity-50 ${on ? "bg-shu text-white" : "bg-card text-ink ring-1 ring-line"}`}
+                    className={`btn ${on ? "btn-on" : "btn-sub"}`}
                   >
                     <Icon name={on ? "check" : "plus"} className="h-4 w-4" />
                     行きたい
                   </button>
-                  <span className="num min-w-0 flex-1 text-right text-xs text-mute">{count ? `${count}人:${names.join("、")}` : "まだ0人"}</span>
+                  <span className="num min-w-0 flex-1 text-right text-xs text-ink2">{count ? `${count}人:${names.join("、")}` : "まだ0人"}</span>
                 </span>
               </li>
             );
           })}
         </ol>
-        {!meName && <p className="text-xs text-mute">呼び名を入れると「行きたい」を押せます(本名でなくて大丈夫です)。</p>}
         {full && <p className="text-xs text-shu">この相談は{PLAN_LIMITS.voters}人が回答済みのため、新しい呼び名では回答できません。</p>}
-        <button
-          type="button"
-          onClick={save}
-          disabled={!meName || !unsaved || full}
-          className="inline-flex h-12 items-center justify-center rounded-full bg-shu px-5 font-bold text-white disabled:bg-line disabled:text-ink2"
-        >
-          {unsaved ? "選んだ内容をリンクに入れる" : "リンクに入っています"}
-        </button>
+        {/* 押したけれどリンクに入れていない間は、下のメニューの上に止めて見えるようにする */}
+        <div className={changed && !full ? "sticky bottom-[calc(3.5rem+1px+0.75rem+env(safe-area-inset-bottom,0px))] z-10" : ""}>
+          <button type="button" onClick={save} disabled={!meName || !unsaved || full} className="btn btn-main min-h-12 w-full text-base">
+            {unsaved ? "選んだ内容をリンクに入れる" : (
+              <>
+                <Icon name="check" className="h-4 w-4" />
+                リンクに入っています
+              </>
+            )}
+          </button>
+        </div>
       </section>
 
       <section aria-labelledby="share" className="flex flex-col gap-3 rounded-xl bg-wash p-4">
@@ -517,12 +563,12 @@ function PlanView({ param, candidates }: { param: string; candidates: PlanCandid
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => track("plan_send", { via: "line" })}
-            className="inline-flex h-11 items-center gap-2 rounded-full bg-card px-4 text-sm font-bold ring-1 ring-line"
+            className="btn btn-sub"
           >
             <span className="grid h-6 w-6 place-items-center rounded-md bg-[#06C755] text-xs font-bold text-white">LINE</span>
             LINEで送る
           </a>
-          <button type="button" onClick={copy} className="inline-flex h-11 items-center gap-2 rounded-full bg-card px-4 text-sm font-bold ring-1 ring-line">
+          <button type="button" onClick={copy} className={`btn ${sent === "copied" ? "btn-on" : "btn-sub"}`}>
             <Icon name={sent === "copied" ? "check" : "copy"} className="h-4 w-4" />
             {sent === "copied" ? "コピーしました" : "リンクをコピー"}
           </button>
@@ -530,7 +576,7 @@ function PlanView({ param, candidates }: { param: string; candidates: PlanCandid
             <button
               type="button"
               onClick={nativeShare}
-              className="inline-flex h-11 items-center gap-2 rounded-full bg-card px-4 text-sm font-bold ring-1 ring-line"
+              className="btn btn-sub"
             >
               <Icon name="share" className="h-4 w-4" />
               ほかのアプリで送る
@@ -549,11 +595,14 @@ function PlanView({ param, candidates }: { param: string; candidates: PlanCandid
             />
           </label>
         )}
-        <p className="text-xs leading-relaxed text-mute">
-          呼び名と票はリンクの # より後ろだけに入り、タビオシのサーバーには送りません。ただし、リンクを送ったアプリ(LINE
-          など)と、リンクを受け取った人には中身が届きます。同じ呼び名は同じ人として数えます(最大
-          {PLAN_LIMITS.voters}人)。「送る」を押しても、相手が開いたかどうかはわかりません。
-        </p>
+        <details className="text-xs leading-relaxed text-ink2">
+          <summary className="inline-flex min-h-11 cursor-pointer items-center font-bold underline">送る内容と、届く範囲</summary>
+          <p>
+            呼び名と票はリンクの # より後ろだけに入り、タビオシのサーバーには送りません。ただし、リンクを送ったアプリ(LINE
+            など)と、リンクを受け取った人には中身が届きます。同じ呼び名は同じ人として数えます(最大
+            {PLAN_LIMITS.voters}人)。「送る」を押しても、相手が開いたかどうかはわかりません。
+          </p>
+        </details>
       </section>
 
       <a href="/pick" className="inline-flex h-11 w-fit items-center text-sm font-bold text-shu underline">

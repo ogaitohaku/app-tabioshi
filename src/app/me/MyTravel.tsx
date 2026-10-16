@@ -72,26 +72,30 @@ export function MyTravel({ videos, places, areas, creators }: { videos: Video[];
               <Icon name={CATEGORY_ICON[p.category]} className="h-3.5 w-3.5" />
               {v?.area}
               {p.sponsored && <PrBadge />}
-              {km !== undefined && <span className="num ml-auto text-ink">{kmLabel(km)}</span>}
+              {km !== undefined && (
+                <span className="num ml-auto inline-flex shrink-0 items-center gap-0.5 text-sm text-ink" data-km>
+                  <Icon name="pin" className="h-3.5 w-3.5" />
+                  {kmLabel(km)}
+                </span>
+              )}
             </span>
-            <span className="block truncate font-bold">{p.name}</span>
-            <span className="block truncate text-xs text-mute">
+            <span className="block leading-snug font-bold">{p.name}</span>
+            <span className="mt-0.5 block truncate text-xs text-mute">
               出典:{c?.name ?? "不明"}の動画 {timecode(p.at)}ごろ
             </span>
           </span>
         </Link>
-        <span className="flex flex-wrap gap-2">
+        <span className="flex flex-wrap items-center gap-2">
           <VisitedButton placeId={p.id} />
-          <a
-            href={googleMapsPlaceUrl(p.lngLat)}
-            target="_blank"
-            rel="noopener"
-            className="inline-flex h-11 items-center gap-1.5 rounded-full bg-card px-4 text-sm font-bold text-ink ring-1 ring-line"
-          >
+          <a href={googleMapsPlaceUrl(p.lngLat)} target="_blank" rel="noopener" className="btn btn-sub">
             <Icon name="map" className="h-4 w-4" />
             地図
           </a>
-          {mine.saved[p.id] && <SavePlaceButton placeId={p.id} iconOnly />}
+          {mine.saved[p.id] && (
+            <span className="ml-auto">
+              <SavePlaceButton placeId={p.id} iconOnly />
+            </span>
+          )}
         </span>
       </li>
     );
@@ -118,7 +122,8 @@ export function MyTravel({ videos, places, areas, creators }: { videos: Video[];
               type="button"
               onClick={locate}
               disabled={near.status === "locating"}
-              className="inline-flex h-11 items-center justify-center gap-1.5 rounded-full bg-shu px-4 text-sm font-bold text-white"
+              aria-busy={near.status === "locating"}
+              className="btn btn-main"
             >
               <Icon name="pin" className="h-4 w-4" />
               {near.status === "ok" ? "いまの場所で並べ直す" : near.status === "locating" ? "場所を確かめています…" : "旅先で:いまいる場所から近い順に並べる"}

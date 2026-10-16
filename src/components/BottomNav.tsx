@@ -10,6 +10,7 @@ const TABS: { href: string; label: string; icon: IconName }[] = [
   { href: "/me", label: "マイ旅", icon: "bookmark" },
 ];
 
+/** 下のメニューの高さは rem で決める(文字を大きくしても、上の画面の余白と食い違わない)。layout と shorts の余白もこれに合わせる */
 export function BottomNav() {
   const path = usePathname();
   return (
@@ -25,7 +26,7 @@ export function BottomNav() {
               <Link
                 href={t.href}
                 aria-current={on ? "page" : undefined}
-                className={`flex flex-col items-center gap-0.5 py-2 text-xs font-bold ${on ? "text-shu" : ""}`}
+                className={`flex h-14 flex-col items-center justify-center gap-0.5 text-xs font-bold ${on ? "text-shu" : ""}`}
               >
                 <Icon name={t.icon} className="h-6 w-6" fill={t.icon === "play" && on} />
                 {t.label}
